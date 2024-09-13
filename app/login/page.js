@@ -1,15 +1,18 @@
 "use client"
-import React from 'react'
-import { useRef } from 'react';
+import React, { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { handleLogin } from '@/serverActions/handleLogin';
+import { useRouter } from 'next/navigation';
 
 const Login = () => {
 
+    const router = useRouter()
+    const [errorMessage, setErrorMessage] = useState("")
+    const [loggedIn, setloggedIn] = useState(false)
     const ref = useRef();
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
+
     const errorStyle = {
         color: "red",
         textAlign: "center",
@@ -17,16 +20,41 @@ const Login = () => {
     }
 
     const onSubmit = async (data) => {
-        const response = await handleLogin(data);
-        console.log(response);
         ref.current.reset();
+        const { username, password } = data;
+        const res = await fetch('../api/userLogin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            // If login successful, redirect to home page
+            setloggedIn(true)
+            await delay(1)
+            router.push('/');
+        } else {
+            setErrorMessage(result.message);
+        }
     };
+
+    const delay = (seconds) => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve()
+            }, seconds * 1000);
+        })
+    }
 
     return (
         <div className="relative h-screen">
+
             <div className='container mx-auto max-w-[480px] absolute inset-0 flex items-center justify-center'>
 
-                <form ref={ref} onSubmit={handleSubmit(onSubmit)} className='px-8 w-full md:border-2 border-y border-white md:rounded-xl '>
+                <form ref={ref} onSubmit={handleSubmit(onSubmit)} className={`px-8 w-full md:border-2 border-y border-white md:rounded-xl ${!loggedIn ? 'block' : 'hidden'}`}>
                     <h2 className='text-center my-8 text-3xl font-bold'>Login</h2>
                     <div>
                         <div className='w-full mt-9'>
@@ -40,6 +68,7 @@ const Login = () => {
                             {errors.password && <div style={errorStyle}>
                                 {errors.password.message}
                             </div>}
+                            {errorMessage && <div style={errorStyle}>{errorMessage}</div>}
                         </div>
                         <div className="remember-forget my-6 flex flex-row justify-between items-center text-lg">
                             <div className="remember cursor-pointer">
@@ -59,7 +88,13 @@ const Login = () => {
                     </div>
 
                 </form>
+
+                <div className={`loggedIn text-center text-3xl text-green-500 ${loggedIn ? 'block' : 'hidden'}`}>
+                    Logged In Successfully!!
+                </div>
+
             </div>
+
         </div>
     )
 }
