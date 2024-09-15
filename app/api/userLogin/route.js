@@ -1,21 +1,24 @@
-"use server"
-import connectToDatabase from '@/lib/mongodb';
-import { User } from '@/models/User';
-import { NextResponse } from 'next/server';
+// Not using post request, using serverAction insted
 
-export async function POST(request) {
 
-    let data = await request.json()
-    const { username, password } = data;
-    console.log(username, password);
+// "use server"
+// import connectToDatabase from '@/lib/mongodb';
+// import { User } from '@/models/User';
+// import { NextResponse } from 'next/server';
 
-    await connectToDatabase();
-    const user = await User.findOne({ username });
+// export async function POST(request) {
 
-    if (!user) {
-        return NextResponse.json({ success: false, message: "Error Loginning In!! Invalid Username or Password" })
-    }
+//     let data = await request.json()
+//     const { username, password } = data;
+//     console.log(username, password);
 
-    return NextResponse.json({ success: true, message: "" })
+//     await connectToDatabase();
+//     const user = await User.findOne({ username });
 
-}
+//     if (!user) {
+//         return NextResponse.json({ success: false, message: "Error Loginning In!! Invalid Username or Password" })
+//     }
+
+//     return NextResponse.json({ success: true, message: "" })
+
+// }
