@@ -1,22 +1,29 @@
 "use server"
-
+import mongoose from "mongoose";
 import connectToDatabase from "@/lib/mongodb";
 import { User } from "@/models/User";
 
 export const handleRegister = async (dataObj) => {
-    const { username, password } = dataObj;
-    console.log(username, password);    
+    const { name, username, password } = dataObj;
+    // console.log(name, username, password);
+    
     await connectToDatabase();
 
     let user = await User.findOne({ username })
-    if (!user) {
+    if (user) {
         return {
             success: false,
-            message: "Login Failed!! Incorrect Username Or Password!"
+            message: "User with this username already exists!"
         }
     }
+    const newUser = new User({
+        name,
+        username,
+        password
+    })
+    await newUser.save()
     return {
         success: true,
-        message: "Logged In Succssfully!"
+        message: "Registered Succssfully!"
     }
 }

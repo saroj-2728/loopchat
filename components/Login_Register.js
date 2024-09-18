@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-const Login_Register = ({ header, handleData, visibility, buttonText, text1, text2, theLink, laterMessage }) => {
+const Login_Register = ({redirectTo, header, handleData, visibility, buttonText, text1, text2, theLink, laterMessage }) => {
 
     const router = useRouter()
     const [errorMessage, setErrorMessage] = useState("")
@@ -20,7 +20,7 @@ const Login_Register = ({ header, handleData, visibility, buttonText, text1, tex
     }
 
     const onSubmit = async (data) => {
-        console.log("Good till here too");
+        // console.log(data);
         ref.current.reset();
 
         const result = await handleData(data)
@@ -29,7 +29,7 @@ const Login_Register = ({ header, handleData, visibility, buttonText, text1, tex
             // If login successful, redirect to home page
             setloggedIn(true)
             await delay(1)
-            router.push('/');
+            router.push(redirectTo);
         } else {
             setErrorMessage(result.message);
         }
@@ -77,7 +77,7 @@ const Login_Register = ({ header, handleData, visibility, buttonText, text1, tex
                             </div>
                         </div>
                         <div className='w-full my-6'>
-                            <input className='py-3.5 border-2 w-full text-center rounded-full text-xl cursor-pointer' disabled={isSubmitting} type="submit" value={buttonText} onClick={() => console.log("Good Till Here!")}/>
+                            <input className='py-3.5 border-2 w-full text-center rounded-full text-xl cursor-pointer' disabled={isSubmitting} type="submit" value={buttonText} />
                         </div>
                         <div className="register text-center w-full my-6 text-lg">
                             <p>{text1} have an account? <Link className='font-bold' href={theLink}> {text2} </Link></p>
@@ -89,7 +89,6 @@ const Login_Register = ({ header, handleData, visibility, buttonText, text1, tex
                 <div className={`loggedIn text-center text-3xl text-green-500 ${loggedIn ? 'block' : 'hidden'}`}>
                     {laterMessage}
                 </div>
-{console.log(errors)}
             </div>
 
         </div>
