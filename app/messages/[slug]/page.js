@@ -1,11 +1,38 @@
 "use client"
 import React, { useEffect, useState, useRef } from 'react'
 import { usersArray } from '@/serverActions/handleUsers'
+import io from "socket.io-client";
+
+let socket;
 
 const messagePage = ({ params }) => {
 
   const [user, setUser] = useState([]);
   const [error, setError] = useState(null);
+  const [inputMessage, setInputMessage] = useState('')
+  const [message, setMessage] = useState('')
+  const [messages, setMessages] = useState([])
+
+  useEffect(() => {
+    socket = io("/api/userMessaging/socket"); 
+    // socket = io("@/app/api/userMessaging/route");
+
+    // Listen for new messages
+    socket.on("message", (msg) => {
+      setMessages((prevMessages) => [...prevMessages, msg]);
+      console.log("It's working     flkjsdfhls");
+    });
+
+    // Cleanup on unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, [])
+
+  const sendMessage = () => {
+    
+  };  
+
   useEffect(() => {
     const fetchUsersName = async () => {
       try {
@@ -24,14 +51,11 @@ const messagePage = ({ params }) => {
   }, [user.name])
   
   const ref = useRef(null)
-  const [inputMessage, setInputMessage] = useState('')
   const handleMessageSent = (e) => {
-    ref.current.innerText += ``
-    const myMessageDiv = <div className=' flex flex-col border my-5'>
-      <span>Me: </span>
-      <p className=' rounded-xl px-5 text-lg bg-sky-600'>this is a very long message and i don't know where its going to appear on the page but what i know is its not gonna look good</p>
-    </div>
-    ref.current.appendChild(myMessageDiv);
+    if (inputMessage.trim()) {
+      socket.emit("message", inputMessage); // Send message to the server
+      setInputMessage("");
+    }
   }
 
   return (
