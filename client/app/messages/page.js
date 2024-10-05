@@ -32,7 +32,7 @@ const messages = () => {
 
     return (
 
-        <div className='w-full border-2 border-white px-7 border-t-0 rounded-b-xl pb-5'>
+        <div className='w-full border-2 border-white px-7 rounded-xl pb-5'>
             <div className='text-xl text-center pt-5'>
                 Pick a user to message !!
             </div>

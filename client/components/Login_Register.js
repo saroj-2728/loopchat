@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-const Login_Register = ({redirectTo, header, handleData, visibility, buttonText, text1, text2, theLink, laterMessage }) => {
+const Login_Register = ({ redirectTo, header, handleData, visibility, buttonText, text1, text2, theLink, laterMessage }) => {
 
     const router = useRouter()
     const [errorMessage, setErrorMessage] = useState("")
@@ -29,6 +29,9 @@ const Login_Register = ({redirectTo, header, handleData, visibility, buttonText,
             // If login successful, redirect to home page
             setloggedIn(true)
             await delay(1)
+            if (redirectTo === '/home')
+                localStorage.setItem('user', data.username);
+
             router.push(redirectTo);
         } else {
             setErrorMessage(result.message);
