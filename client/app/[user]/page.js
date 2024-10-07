@@ -1,14 +1,11 @@
 "use client"
-import { UserContext } from '@/context/userContext';
 import { useRouter } from 'next/navigation';
-import { useContext } from 'react';
 
-const Home = () => {
+const User = ({params}) => {
 
-    const { user } = useContext(UserContext)
     const router = useRouter()
     const handleMessaging = () => {
-        router.push(`${user.username}/messages`)
+        router.push(`/${params.userMessages}/messages`)
     }
 
     const handleLogOut = () => {
@@ -28,4 +25,4 @@ const Home = () => {
     )
 }
 
-export default Home
+export default User

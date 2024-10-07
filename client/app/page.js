@@ -12,14 +12,14 @@ export default function Home() {
 
   useEffect(() => {
     if (isLoggedIn()) {
-      router.push('/home');
+      // router.push('/home');
     } else {
-      router.push('/login');
+      // router.push('/login');
     }
   }, [router]);
 
   return (
-    <div className='w-full h-full mt-10 flex items-center justify-center'>
+    <div className='w-full h-[calc(100vh-64px)] flex items-center justify-center'>
       <div className='text-green-600 text-3xl'>
         Checking Login Status!!
       </div>

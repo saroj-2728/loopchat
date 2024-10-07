@@ -19,6 +19,10 @@ export const handleLogin = async (dataObj) => {
     if (user.password === password) {
         return {
             success: true,
+            userData: {
+                name: user.name,
+                username: user.username
+            },
             message: "Logged In Succssfully!"
         }
     }

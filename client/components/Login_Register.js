@@ -1,10 +1,11 @@
 "use client"
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useContext } from 'react'
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { UserContext } from '@/context/userContext';
 
-const Login_Register = ({ redirectTo, header, handleData, visibility, buttonText, text1, text2, theLink, laterMessage }) => {
+const Login_Register = ({ component, redirectTo, header, handleData, visibility, buttonText, text1, text2, theLink, laterMessage }) => {
 
     const router = useRouter()
     const [errorMessage, setErrorMessage] = useState("")
@@ -19,6 +20,7 @@ const Login_Register = ({ redirectTo, header, handleData, visibility, buttonText
         marginTop: "10px"
     }
 
+    const { setUser } = useContext(UserContext);
     const onSubmit = async (data) => {
         // console.log(data);
         ref.current.reset();
@@ -26,12 +28,21 @@ const Login_Register = ({ redirectTo, header, handleData, visibility, buttonText
         const result = await handleData(data)
 
         if (result.success) {
-            // If login successful, redirect to home page
             setloggedIn(true)
-            await delay(1)
-            if (redirectTo === '/home')
-                localStorage.setItem('user', data.username);
+            if (component === 'login') {
+                const loggedInUser = {
+                    name: result.userData.name,
+                    username: result.userData.username
+                };
+                setUser(loggedInUser);
+                const setCookie = (name, value, days) => {
+                    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+                    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+                };
+                setCookie('user', JSON.stringify(loggedInUser), 7);
+            }
 
+            await delay(1)
             router.push(redirectTo);
         } else {
             setErrorMessage(result.message);
@@ -47,7 +58,7 @@ const Login_Register = ({ redirectTo, header, handleData, visibility, buttonText
     }
 
     return (
-        <div className="relative h-screen">
+        <div className="relative h-[calc(100vh-64px)]">
 
             <div className='container mx-auto max-w-[480px] absolute inset-0 flex items-center justify-center'>
 
