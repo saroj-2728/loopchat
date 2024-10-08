@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);  // Create a server 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: 'https://next-js-chat-app-5lgs.vercel.app/',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
     transports: ['websocket']
@@ -16,7 +16,7 @@ const io = new Server(server, {
 
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'https://next-js-chat-app-5lgs.vercel.app/',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 }));
 
@@ -30,10 +30,7 @@ io.on("connection", (socket) => {
 
   // Handle private message event
   socket.on("privateMessage", ({ inputMessage, sender, receiverId }) => {
-    // console.log(inputMessage);
     const receiverSocketId = users[receiverId];
-    // console.log(users);
-    // console.log(sender);
     if (receiverSocketId) {
       socket.to(receiverSocketId).emit("privateMessage", {
         inputMessage,
@@ -51,7 +48,7 @@ app.get('/', (req, res) => {
   res.send('Socket.IO server is running');
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
