@@ -5,7 +5,7 @@ import { io } from 'socket.io-client';
 import { UserContext } from '@/context/userContext';
 import { useRouter } from 'next/navigation';
 
-const messagePage = ({ params }) => {
+const MessagePage = ({ params }) => {
 
   const { user: userMe } = useContext(UserContext);
   const router = useRouter()
@@ -19,7 +19,7 @@ const messagePage = ({ params }) => {
 
   useEffect(() => {
     if (!userMe) return;
-    
+
     const fetchUsersName = async () => {
       try {
         const data = await usersArray("all");
@@ -35,7 +35,7 @@ const messagePage = ({ params }) => {
       }
     };
     fetchUsersName();
-  }, [userMe]);
+  }, [userMe,params.slug,router]);
 
   useEffect(() => {
     document.title = `Message ${targetUser.name}`
@@ -136,4 +136,4 @@ const messagePage = ({ params }) => {
 
 }
 
-export default messagePage
+export default MessagePage

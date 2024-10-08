@@ -5,7 +5,7 @@ import { useEffect, useState, useContext } from 'react'
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@/context/userContext';
 
-const messages = () => {
+const Messages = () => {
 
     const { user: userMe } = useContext(UserContext)
     const router = useRouter()
@@ -56,6 +56,6 @@ const messages = () => {
     )
 }
 
-export default messages
+export default Messages
 
 
