@@ -24,30 +24,35 @@ const messages = () => {
         fetchUsers();
     }, []);
 
-    useEffect(() => {
-        document.title = "Messages"
-    }, []);
-
     const handleUserMessaging = (users) => {
         router.push(`/${userMe.username}/messages/${users.username}`);
     }
 
     return (
 
-        <div className='w-full border-2 border-white px-7 rounded-xl pb-5'>
-            <div className='text-xl text-center pt-5'>
-                Pick a user to message !!
-            </div>
-            <div className="users">
-                {users.map((user) => {
-                    return (
-                        <div key={user._id} className='text-center border border-white py-5 text-2xl rounded-xl my-5 cursor-pointer' onClick={() => handleUserMessaging(user)}>
-                            {`${user.name} (${user.username})`}
-                        </div>
-                    );
-                })}
+        <div className="flex flex-col items-center h-[calc(100vh-104px)] border rounded-xl bg-gray-900 py-4">
+            <div className="shadow-lg rounded-lg p-2 w-full max-w-md text-center h-full flex flex-col">
+                <h1 className="text-2xl mb-3 font-bold text-sky-600">Pick a User to Message!</h1>
+
+                <div className="users mt-5 overflow-y-auto flex-grow"> {/* Using flex-grow to fill available space */}
+                    {users.length > 0 ? (
+                        users.map((user) => (
+                            <div
+                                key={user._id}
+                                className="border border-white py-4 text-xl rounded-xl my-2 cursor-pointer transition duration-300 hover:bg-gray-600"
+                                onClick={() => handleUserMessaging(user)}
+                            >
+                                {`${user.name} (${user.username})`}
+                            </div>
+                        ))
+                    ) : (
+                        <p className="font-bold text-sky-600">No users available to message.</p>
+                    )}
+                </div>
             </div>
         </div>
+
+
     )
 }
 

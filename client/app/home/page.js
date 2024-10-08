@@ -18,10 +18,16 @@ const Home = () => {
 
     return (
         <>
-            <div className='w-full h-[calc(100vh-64px)] flex justify-center items-center'>
-                <div className='flex flex-col mx-auto w-1/2 max-w-[380px] min-w-[300px] gap-10 items-center'>
-                    <button className='py-3.5 md:py-4 text-xl w-full bg-sky-500 text-white font-bold text-center rounded-full' onClick={handleMessaging}>Start Messaging</button>
-                    <button className='py-3.5 md:py-4 text-xl w-full bg-sky-500 text-white font-bold text-center rounded-full' onClick={handleLogOut}>Log Out</button>
+            <div className="flex flex-col h-[calc(100vh-64px)] items-center justify-center">
+                <div className="bg-white shadow-md rounded-lg p-8 text-center flex flex-col gap-4 px-14">
+                    <h1 className="text-3xl font-bold text-sky-600">
+                        Welcome, {user?.name || "User"}!
+                    </h1>
+                    <p className="text-black">Start messaging now with the other users there.</p>
+
+                    <button className='py-3.5 md:py-4 text-xl w-full text-center bg-white text-blue-600 font-semibold rounded-full shadow-2xl hover:bg-gray-200 border border-black' onClick={handleMessaging}>Go to Messages</button>
+
+                    <button className='py-3.5 md:py-4 text-xl w-full text-center  bg-white text-blue-600 font-semibold rounded-full shadow-lg hover:bg-gray-200 border border-black' onClick={handleLogOut}>Log Out</button>
                 </div>
             </div>
         </>
