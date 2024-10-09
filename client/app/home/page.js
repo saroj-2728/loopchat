@@ -13,6 +13,8 @@ const Home = () => {
 
     const handleLogOut = () => {
         localStorage.removeItem('user')
+        document.cookie = `user=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+        console.log(user.username);
         router.push('/')
     }
 

@@ -12,10 +12,9 @@ export default function Home() {
     const cookies = document.cookie.split('; ');
     const cookie = cookies.find(cookie => cookie.startsWith(`${"user"}=`));
 
-    const localUser = localStorage.getItem("user");
     const cookieUser = cookie ? decodeURIComponent(cookie.split('=')[1]) : null;
 
-    return localUser || cookieUser;
+    return cookieUser;
   };
 
   useEffect(() => {

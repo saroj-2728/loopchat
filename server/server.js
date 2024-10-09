@@ -23,7 +23,7 @@ app.use(cors({
 const users = {};
 
 io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
+  // console.log(`User connected: ${socket.id}`);
   socket.on("register", (userId) => {
     users[userId] = socket.id;
   });
@@ -40,7 +40,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`User disconnected: ${socket.id}`);
+    // console.log(`User disconnected: ${socket.id}`);
   });
 });
 
@@ -50,7 +50,7 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running!!`);
 });
 
 

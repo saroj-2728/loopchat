@@ -27,7 +27,7 @@ const Login_Register = ({ component, redirectTo, header, handleData, visibility,
 
         const result = await handleData(data)
 
-        if (result.success) {
+        if (result?.success) {
             setloggedIn(true)
             if (component === 'login') {
                 const loggedInUser = {
