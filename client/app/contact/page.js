@@ -14,7 +14,7 @@ const Contact = () => {
                                 Name
                             </label>
                             <input
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className="shadow appearance-none border rounded-lg w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 id="name"
                                 type="text"
                                 placeholder="Your Name"
@@ -26,7 +26,7 @@ const Contact = () => {
                                 Email
                             </label>
                             <input
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className="shadow appearance-none border rounded-lg w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 id="email"
                                 type="email"
                                 placeholder="Your Email"
@@ -38,7 +38,7 @@ const Contact = () => {
                                 Message
                             </label>
                             <textarea
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 id="message"
                                 placeholder="Your Message"
                                 rows="4"
@@ -47,7 +47,7 @@ const Contact = () => {
                         </div>
                         <div className="flex items-center justify-center">
                             <button
-                                className="bg-white hover:bg-sky-200 transition-colors duration-300 text-blue-600 font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                className="bg-white hover:bg-sky-200 transition-colors duration-300 text-blue-600 font-semibold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline"
                                 type="submit"
                             >
                                 Send Message

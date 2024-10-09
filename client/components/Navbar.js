@@ -9,6 +9,7 @@ import profileImage from '@/images/logo.png';
 const Navbar = () => {
     const router = useRouter();
     const { user, logout } = useContext(UserContext);
+    const [isLoading, setLoading] = useState(true)
     const [isPopupVisible, setPopupVisible] = useState(false);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const popupRef = useRef(null);
@@ -16,6 +17,12 @@ const Navbar = () => {
 
     const togglePopup = () => setPopupVisible(!isPopupVisible);
     const toggleMobileMenu = () => setMobileMenuOpen(!isMobileMenuOpen);
+
+    useEffect(() => {
+        if (user?.username)
+            setLoading(false)
+    }, [user])
+
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -84,16 +91,21 @@ const Navbar = () => {
 
                         {/* User and Popup */}
                         <div className="relative">
-                            {user?.name ? (
-                                <div className="flex gap-4 items-center">
-                                    <span>{user.name}</span>
-                                    <button onClick={togglePopup}  id="user-popup-button"  className="relative flex rounded-full bg-gray-800">
-                                        <span className="sr-only">Open user menu</span>
-                                        <Image src={profileImage} width={35} height={35} alt="Profile" />
-                                    </button>
-                                </div>
+                            {!isLoading ? (
+                                user?.name ? (
+                                    <div className="flex gap-4 items-center">
+                                        <span>{user.name}</span>
+                                        <button onClick={togglePopup} id="user-popup-button" className="relative flex rounded-full bg-gray-800">
+                                            <span className="sr-only">Open user menu</span>
+                                            <Image src={profileImage} width={35} height={35} alt="Profile" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button onClick={handleLoginClick} className="bg-white text-blue-600 font-semibold py-2 px-6 rounded-full shadow-lg hover:bg-gray-200">Login</button>
+                                )
                             ) : (
-                                <button onClick={handleLoginClick} className="bg-white text-blue-600 font-semibold py-2 px-6 rounded-full shadow-lg hover:bg-gray-200">Login</button>
+                                <div className="loader w-8 h-8 border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full animate-spin">
+                                </div>
                             )}
 
                             {isPopupVisible && (
