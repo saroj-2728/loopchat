@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import connectDatabaseOnLanding from "@/serverActions/connectDatabase";
 
 export default function Home() {
 
@@ -16,6 +17,14 @@ export default function Home() {
 
     return cookieUser;
   };
+
+  useEffect(() => {
+    const connectDatabase = async () => {
+      await connectDatabaseOnLanding()
+    }
+    connectDatabase()
+  }, [process.env.M])
+
 
   useEffect(() => {
     const delayedAction = async () => {
@@ -41,7 +50,7 @@ export default function Home() {
             <section className="flex flex-col items-center text-center bg-gradient-to-r from-sky-500 to-indigo-600 text-white py-20 px-6 md:px-16 rounded-lg shadow-lg">
               <h1 className="text-white text-5xl font-bold mb-4">Connect Instantly, Chat Effortlessly</h1>
               <p className="text-white text-lg mb-6">Real-time messaging, private conversations, and seamless interaction.</p>
-              <button onClick={() => {router.push('/login')}} className="bg-white text-blue-600 font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-gray-200">
+              <button onClick={() => { router.push('/login') }} className="bg-white text-blue-600 font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-gray-200">
                 Get Started
               </button>
             </section>

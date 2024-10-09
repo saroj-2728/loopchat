@@ -33,6 +33,13 @@ const Navbar = () => {
         router.push('/login')
     }
 
+    const pushToLandingPage = () => {
+        if (user?.username)
+            router.push('/home')
+        else
+            router.push('/')
+    }
+
     return (
         <div className='sticky top-0 z-20'>
             <nav className="bg-gray-800">
@@ -62,7 +69,7 @@ const Navbar = () => {
                             </button>
                         </div>
                         <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                            <div className="flex flex-shrink-0 items-center">
+                            <div onClick={pushToLandingPage} className="flex flex-shrink-0 items-center cursor-pointer">
                                 <Image
                                     src={profileImage}
                                     width={35}
@@ -72,7 +79,7 @@ const Navbar = () => {
                             </div>
                             <div className="hidden sm:ml-6 sm:block">
                                 <div className="flex space-x-4">
-                                    <Link href="/home" className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</Link>
+                                    <Link href={user?.username ? `/home` : `/`} className="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white" aria-current="page">Home</Link>
                                     <Link href="/about" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">About</Link>
                                     <Link href={`/${user?.username}/messages`} className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Messages</Link>
                                     <Link href="/contact/contactme" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Contact</Link>

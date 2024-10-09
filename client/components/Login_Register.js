@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@/context/userContext';
 
-const Login_Register = ({ component, redirectTo, header, handleData, visibility, buttonText, text1, text2, theLink, laterMessage }) => {
+const Login_Register = ({ component, handleData, laterMessage }) => {
 
     const router = useRouter()
     const [errorMessage, setErrorMessage] = useState("")
@@ -43,7 +43,7 @@ const Login_Register = ({ component, redirectTo, header, handleData, visibility,
             }
 
             await delay(1)
-            router.push(redirectTo);
+            router.push(component === 'login' ? "/home" : "/login");
         } else {
             setErrorMessage(result.message);
         }
@@ -58,53 +58,86 @@ const Login_Register = ({ component, redirectTo, header, handleData, visibility,
     }
 
     return (
-        <div className="relative h-[calc(100vh-64px)]">
+        <div className="relative h-[calc(100vh-64px)] flex justify-center items-center bg-gradient-to-br from-blue-400 to-blue-600">
+            <div className="container mx-auto max-w-[480px] bg-white/30 backdrop-blur-lg shadow-lg rounded-xl p-10">
+                <form ref={ref} onSubmit={handleSubmit(onSubmit)} className={`w-full ${!loggedIn ? 'block' : 'hidden'}`}>
+                    <h2 className="text-center mb-8 text-3xl font-bold text-white">{component === 'login' ? "Login" : "Register"}</h2>
 
-            <div className='container mx-auto max-w-[480px] absolute inset-0 flex items-center justify-center'>
-
-                <form ref={ref} onSubmit={handleSubmit(onSubmit)} className={`px-8 w-full md:border-2 border-y border-white md:rounded-xl ${!loggedIn ? 'block' : 'hidden'}`}>
-                    <h2 className='text-center my-8 text-3xl font-bold'>{header}</h2>
                     <div>
-                        <div className={`w-full mt-9 ${visibility ? "block" : "hidden"}`}>
-                            <input name='name' id='name' placeholder='Name' className="w-full  py-3.5 rounded-full text-black text-xl px-8" type="text" {...register("name", { required: visibility })} />
-                        </div>
-                        <div className='w-full mt-9'>
-                            <input name='username' id='username' placeholder='Username' className="w-full  py-3.5 rounded-full text-black text-xl px-8" type="text" {...register("username", { required: true, minLength: { value: 3, message: "Username must be at least 3 characters long!" }, validate: value => !/\s/g.test(value) || 'No spaces allowed in username' })} />
-                            {errors.username && <div style={errorStyle}>
-                                {errors.username.message}
-                            </div>}
-                        </div>
-                        <div className='w-full mt-9'>
-                            <input name='password' id='password' placeholder='Password' className='w-full py-3.5 rounded-full text-black text-xl px-8' type="password" {...register("password", { required: true, minLength: { value: 8, message: "Password must be at least 8 characters long!" }, })} />
-                            {errors.password && <div style={errorStyle}>
-                                {errors.password.message}
-                            </div>}
-                            {errorMessage && <div style={errorStyle}>{errorMessage}</div>}
-                        </div>
-                        <div className={`remember-forget my-6  flex-row justify-between items-center text-lg ${visibility ? "hidden" : "flex"}`}>
-                            <div className="remember cursor-pointer">
-                                <input type="checkbox" id="remember" name="remember" className='me-2 cursor-pointer' />
-                                <label className='text-lg cursor-pointer' htmlFor="remember">Remember Me</label>
+                        {component === 'register' && (
+                            <div className="w-full mb-6">
+                                <input
+                                    name="name"
+                                    id="name"
+                                    placeholder="Name"
+                                    className="w-full py-3 px-6 rounded-full text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
+                                    type="text"
+                                    {...register("name", { required: component === 'register' })}
+                                />
                             </div>
-                            <div className="forget">
-                                <Link href="/"> Forgot Password </Link>
+                        )}
+
+                        <div className="w-full mb-6">
+                            <input
+                                name="username"
+                                id="username"
+                                placeholder="Username"
+                                className="w-full py-3 px-6 rounded-full text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
+                                type="text"
+                                {...register("username", {
+                                    required: true,
+                                    minLength: { value: 3, message: "Username must be at least 3 characters long!" },
+                                    validate: value => !/\s/g.test(value) || 'No spaces allowed in username',
+                                })}
+                            />
+                            {errors.username && <div className="text-red-500 text-center mt-2">{errors.username.message}</div>}
+                        </div>
+
+                        <div className="w-full mb-6">
+                            <input
+                                name="password"
+                                id="password"
+                                placeholder="Password"
+                                className="w-full py-3 px-6 rounded-full text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
+                                type="password"
+                                {...register("password", {
+                                    required: true,
+                                    minLength: { value: 8, message: "Password must be at least 8 characters long!" },
+                                })}
+                            />
+                            {errors.password && <div className="text-red-500 text-center mt-2">{errors.password.message}</div>}
+                            {errorMessage && <div className="text-red-500 text-center mt-2">{errorMessage}</div>}
+                        </div>
+
+                        {component === 'login' && (
+                            <div className="flex justify-between items-center mb-6">
+                                <div className="flex items-center">
+                                    <input type="checkbox" id="remember" name="remember" className="mr-2" />
+                                    <label htmlFor="remember" className="text-white">Remember Me</label>
+                                </div>
+                                <Link href="/" className="text-white hover:underline hover:text-black transition-all duration-300 ease-in-out">Forgot Password?</Link>
                             </div>
+                        )}
+
+                        <div className="w-full mb-6">
+                            <input
+                                className='py-4 w-full text-center rounded-full bg-white text-blue-600 font-semibold shadow-lg text-xl cursor-pointer hover:bg-sky-200 transition-colors duration-300'
+                                disabled={isSubmitting}
+                                type="submit"
+                                value={component === 'register' ? "Register" : "Login"}
+                            />
                         </div>
-                        <div className='w-full my-6'>
-                            <input className='py-3.5 border-2 w-full text-center rounded-full text-xl cursor-pointer' disabled={isSubmitting} type="submit" value={buttonText} />
-                        </div>
-                        <div className="register text-center w-full my-6 text-lg">
-                            <p>{text1} have an account? <Link className='font-bold' href={theLink}> {text2} </Link></p>
+
+                        <div className="text-center w-full text-lg text-white">
+                            <p>{component === 'register' ? "Already" : "Don't"} have an account? <Link className="text-sky-100 font-bold hover:underline hover:text-black transition-all duration-300 ease-in-out" href={component === 'register' ? "/login" : "/register"}>{component === 'register' ? "Login" : "Sign Up"}</Link></p>
                         </div>
                     </div>
-
                 </form>
 
-                <div className={`loggedIn text-center text-3xl text-green-500 ${loggedIn ? 'block' : 'hidden'}`}>
-                    {laterMessage}
+                <div className={`loggedIn text-center text-3xl ${loggedIn ? 'block' : 'hidden'}`}>
+                    {component === 'register' ? "Registered Successfully!!" : "Logged In Successfully!!"}
                 </div>
             </div>
-
         </div>
     )
 }
