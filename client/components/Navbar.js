@@ -9,7 +9,7 @@ import profileImage from '@/images/logo.png';
 const Navbar = () => {
     const router = useRouter();
     const { user, logout } = useContext(UserContext);
-    const [isLoading, setLoading] = useState(true)
+    const [status, setStatus] = useState("loading");
     const [isPopupVisible, setPopupVisible] = useState(false);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const popupRef = useRef(null);
@@ -19,9 +19,14 @@ const Navbar = () => {
     const toggleMobileMenu = () => setMobileMenuOpen(!isMobileMenuOpen);
 
     useEffect(() => {
-        if (user?.username)
-            setLoading(false)
-    }, [user])
+        if (user === undefined) {
+            setStatus("loading");
+        } else if (user) {
+            setStatus("loggedIn");
+        } else {
+            setStatus("loggedOut");
+        }
+    }, [user]);
 
 
     useEffect(() => {
@@ -91,22 +96,32 @@ const Navbar = () => {
 
                         {/* User and Popup */}
                         <div className="relative">
-                            {!isLoading ? (
-                                user?.name ? (
-                                    <div className="flex gap-4 items-center">
-                                        <span>{user.name}</span>
-                                        <button onClick={togglePopup} id="user-popup-button" className="relative flex rounded-full bg-gray-800">
-                                            <span className="sr-only">Open user menu</span>
-                                            <Image src={profileImage} width={35} height={35} alt="Profile" />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <button onClick={handleLoginClick} className="bg-white text-blue-600 font-semibold py-2 px-6 rounded-full shadow-lg hover:bg-gray-200">Login</button>
-                                )
-                            ) : (
-                                <div className="loader w-8 h-8 border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full animate-spin">
+                            {status === "loading" ? (
+                                <div className="loader w-8 h-8 border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
+                            ) : status === "loggedIn" ?  (
+                                // If user is logged in, show user info
+                                <div className="flex gap-4 items-center">
+                                    <span>{user?.name}</span>
+                                    <button
+                                        onClick={togglePopup}
+                                        id="user-popup-button"
+                                        className="relative flex rounded-full bg-gray-800"
+                                    >
+                                        <span className="sr-only">Open user menu</span>
+                                        <Image src={profileImage} width={35} height={35} alt="Profile" />
+                                    </button>
                                 </div>
+                            ) : (
+                                // If no user is logged in, show login button
+                                <button
+                                    onClick={handleLoginClick}
+                                    className="bg-white text-blue-600 font-semibold py-2 px-6 rounded-full shadow-lg hover:bg-gray-200"
+                                >
+                                    Login
+                                </button>
                             )}
+
+
 
                             {isPopupVisible && (
                                 <div ref={popupRef} className="absolute right-0 z-10 mt-2 w-48 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
