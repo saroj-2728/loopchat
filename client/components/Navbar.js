@@ -1,136 +1,124 @@
-"use client"
-import Link from 'next/link'
-import Image from 'next/image'
-import { useRef, useEffect, useState, useContext } from 'react'
-import { useRouter } from 'next/navigation'
+"use client";
+import Link from 'next/link';
+import Image from 'next/image';
+import { useRef, useEffect, useState, useContext } from 'react';
+import { useRouter } from 'next/navigation';
 import { UserContext } from '@/context/userContext';
-import profileImage from '@/images/logo.png'
+import profileImage from '@/images/logo.png';
 
 const Navbar = () => {
-
     const router = useRouter();
-    const { user } = useContext(UserContext);
+    const { user, logout } = useContext(UserContext);
     const [isPopupVisible, setPopupVisible] = useState(false);
+    const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const popupRef = useRef(null);
+    const mobileMenuRef = useRef(null);
 
-    const togglePopup = () => {
-        setPopupVisible(!isPopupVisible);
-    };
+    const togglePopup = () => setPopupVisible(!isPopupVisible);
+    const toggleMobileMenu = () => setMobileMenuOpen(!isMobileMenuOpen);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (isPopupVisible && popupRef.current && !popupRef.current.contains(event.target)) {
+            if (isPopupVisible && popupRef.current && !popupRef.current.contains(event.target) && !event.target.closest('#user-popup-button')) {
                 setPopupVisible(false);
             }
+
+            if (isMobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && !event.target.closest('#mobile-menu-button')) {
+                setMobileMenuOpen(false);
+            }
         };
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isPopupVisible]);
+    }, [isPopupVisible, isMobileMenuOpen]);
 
-    const handleLoginClick = () => {
-        router.push('/login')
-    }
+    const handleLoginClick = () => router.push('/login');
+    const navigateToHome = () => router.push(user?.username ? '/home' : '/');
 
-    const pushToLandingPage = () => {
-        if (user?.username)
-            router.push('/home')
-        else
-            router.push('/')
+    const handleLogoutClick = () => {
+        logout();
+        togglePopup();
+        router.push('/')
     }
 
     return (
-        <div className='sticky top-0 z-20'>
+        <div className="sticky top-0 z-20">
             <nav className="bg-gray-800">
                 <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
                     <div className="relative flex h-16 items-center justify-between">
-                        <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                            {/* <!-- Mobile menu button--> */}
-                            <button type="button" className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
-                                <span className="absolute -inset-0.5"></span>
-                                <span className="sr-only">Open main menu</span>
-                                {/* <!--
-            Icon when menu is closed.
-
-            Menu open: "hidden", Menu closed: "block"
-          --> */}
-                                <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                                </svg>
-                                {/* <!--
-            Icon when menu is open.
-
-            Menu open: "block", Menu closed: "hidden"
-          --> */}
-                                <svg className="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
+                        {/* Mobile menu button */}
+                        <button
+                            onClick={toggleMobileMenu}
+                            id="mobile-menu-button"
+                            className="sm:hidden p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-inset focus:ring-white rounded-full"
+                            aria-controls="mobile-menu"
+                            aria-expanded={isMobileMenuOpen}>
+                            <span className="sr-only">Open main menu</span>
+                            {isMobileMenuOpen ? (
+                                <svg className="block h-6 w-6" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
-                            </button>
-                        </div>
-                        <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                            <div onClick={pushToLandingPage} className="flex flex-shrink-0 items-center cursor-pointer">
-                                <Image
-                                    src={profileImage}
-                                    width={35}
-                                    height={35}
-                                    alt="Chat App Logo"
-                                />
-                            </div>
-                            <div className="hidden sm:ml-6 sm:block">
-                                <div className="flex space-x-4">
-                                    <Link href={user?.username ? `/home` : `/`} className="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white" aria-current="page">Home</Link>
-                                    <Link href="/about" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">About</Link>
-                                    <Link href={`/${user?.username}/messages`} className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Messages</Link>
-                                    <Link href="/contact/contactme" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Contact</Link>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                            ) : (
+                                <svg className="block h-6 w-6" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                </svg>
+                            )}
+                        </button>
 
-                            {/* <!-- Profile dropdown --> */}
-                            <div className="relative ml-3">
-                                <div className='flex gap-4 items-center'>
-                                    {user?.name ? <span> {user.name}</span> : <button onClick={handleLoginClick} className='bg-white text-blue-600 font-semibold py-2 px-6 rounded-full shadow-lg hover:bg-gray-200'>Login</button>}
-                                    <button onClick={togglePopup} type="button" className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" aria-expanded="false" aria-haspopup="true">
-                                        <span className="absolute -inset-1.5"></span>
+                        {/* Logo */}
+                        <div onClick={navigateToHome} className="hidden md:flex cursor-pointer">
+                            <Image src={profileImage} width={35} height={35} alt="Chat App Logo" />
+                        </div>
+
+                        {/* Desktop Links */}
+                        <div className="hidden sm:block">
+                            <div className="flex space-x-4">
+                                <Link href={user?.username ? `/home` : `/`} className="hover:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white rounded-lg">Home</Link>
+                                <Link href="/about" className="hover:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white rounded-lg">About</Link>
+                                <Link href={`/${user?.username}/messages`} className="hover:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white rounded-lg">Messages</Link>
+                                <Link href="/contact" className="hover:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white rounded-lg">Contact</Link>
+                            </div>
+                        </div>
+
+                        {/* User and Popup */}
+                        <div className="relative">
+                            {user?.name ? (
+                                <div className="flex gap-4 items-center">
+                                    <span>{user.name}</span>
+                                    <button onClick={togglePopup}  id="user-popup-button"  className="relative flex rounded-full bg-gray-800">
                                         <span className="sr-only">Open user menu</span>
-                                        {user?.name && <Image
-                                            src={profileImage}
-                                            width={35}
-                                            height={35}
-                                            alt="Chat App Logo"
-                                        />}
+                                        <Image src={profileImage} width={35} height={35} alt="Profile" />
                                     </button>
-
                                 </div>
-                                {isPopupVisible && (
-                                    <div ref={popupRef} className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabIndex="-1">
-                                        {/* <!-- Active: "bg-gray-100", Not Active: "" --> */}
-                                        <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex="-1" id="user-menu-item-0">Your Profile</a>
-                                        <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex="-1" id="user-menu-item-1">Settings</a>
-                                        <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex="-1" id="user-menu-item-2">Sign out</a>
-                                    </div>
-                                )}
-                            </div>
+                            ) : (
+                                <button onClick={handleLoginClick} className="bg-white text-blue-600 font-semibold py-2 px-6 rounded-full shadow-lg hover:bg-gray-200">Login</button>
+                            )}
+
+                            {isPopupVisible && (
+                                <div ref={popupRef} className="absolute right-0 z-10 mt-2 w-48 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                                    <a href="#" onClick={togglePopup} className="block px-4 py-2 text-sm text-gray-700">Your Profile</a>
+                                    <a href="#" onClick={togglePopup} className="block px-4 py-2 text-sm text-gray-700">Settings</a>
+                                    <p href="#" onClick={handleLogoutClick} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer">Sign out</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
 
-                {/* <!-- Mobile menu, show/hide based on menu state. --> */}
-                {/* <div className="sm:hidden" id="mobile-menu">
-                    <div className="space-y-1 px-2 pb-3 pt-2"> */}
-                {/* <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" --> */}
-                {/* <Link href="#" className="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">Dashboard</Link>
-                        <Link href="#" className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Team</Link>
-                        <Link href="#" className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Projects</Link>
-                        <Link href="#" className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Calendar</Link>
+                {/* Mobile Menu */}
+                {isMobileMenuOpen && (
+                    <div ref={mobileMenuRef} id="mobile-menu" className="absolute top-16 left-0 right-0 bg-gray-800 px-2 pt-2 pb-3 z-10">
+                        <Link href={user?.username ? `/home` : `/`} className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" onClick={toggleMobileMenu}>Home</Link>
+                        <Link href="/about" className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" onClick={toggleMobileMenu}>About</Link>
+                        <Link href={`/${user?.username}/messages`} className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" onClick={toggleMobileMenu}>Messages</Link>
+                        <Link href="/contact" className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" onClick={toggleMobileMenu}>Contact</Link>
                     </div>
-                </div> */}
+                )}
             </nav>
-
         </div>
-    )
+    );
 }
 
-export default Navbar
+export default Navbar;

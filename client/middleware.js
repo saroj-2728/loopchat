@@ -18,7 +18,7 @@ export function middleware(request) {
     pathname === '/register' || 
     pathname === '/' || 
     pathname === '/about' ||
-    (isLoggedIn && pathname === '/home') 
+    (isLoggedIn && (pathname === '/home' || pathname === '/contact')) 
   ) {
     return NextResponse.next();
   }

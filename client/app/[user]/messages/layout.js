@@ -1,7 +1,7 @@
 export default function RootLayout({ children }) {
     return (
         <>
-            <div className='max-w-[1024px] mx-auto rounded-xl mt-5 pb-5 relative flex flex-col'>
+            <div className='max-w-[1024px] mx-auto md:mt-5 md:pb-5 relative flex flex-col'>
                 {children}
             </div>
         </>

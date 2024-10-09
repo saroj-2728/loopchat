@@ -30,11 +30,11 @@ const Messages = () => {
 
     return (
 
-        <div className="flex flex-col items-center h-[calc(100vh-104px)] border rounded-xl bg-gray-900 py-4">
-            <div className="shadow-lg rounded-lg p-2 w-full max-w-md text-center h-full flex flex-col">
-                <h1 className="text-2xl mb-3 font-bold text-sky-600">Pick a User to Message!</h1>
+        <div className="flex flex-col items-center md:h-[calc(100vh-104px)] h-[calc(100vh-64px)] md:border md:rounded-xl bg-gray-900 md:py-4">
+            <div className="shadow-lg rounded-lg p-4 w-full max-w-md text-center h-full flex flex-col">
+                <h1 className="text-xl md:text-2xl mt-2 md:mb-2 font-bold text-sky-600">Pick a User to Message!</h1>
 
-                <div className="users mt-5 overflow-y-auto flex-grow"> {/* Using flex-grow to fill available space */}
+                <div className="users mt-4 overflow-y-auto flex-grow">
                     {users.length > 0 ? (
                         users.map((user) => (
                             <div

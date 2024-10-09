@@ -9,6 +9,7 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
 
     const router = useRouter()
     const [errorMessage, setErrorMessage] = useState("")
+    const [isLoading, setLoading] = useState(false)
     const [loggedIn, setloggedIn] = useState(false)
     const ref = useRef();
 
@@ -22,8 +23,8 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
 
     const { setUser } = useContext(UserContext);
     const onSubmit = async (data) => {
-        // console.log(data);
         ref.current.reset();
+        setLoading(true)
 
         const result = await handleData(data)
 
@@ -45,6 +46,7 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
             await delay(1)
             router.push(component === 'login' ? "/home" : "/login");
         } else {
+            setLoading(false)
             setErrorMessage(result.message);
         }
     };
@@ -58,19 +60,24 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
     }
 
     return (
-        <div className="relative h-[calc(100vh-64px)] flex justify-center items-center bg-gradient-to-br from-blue-400 to-blue-600">
-            <div className="container mx-auto max-w-[480px] bg-white/30 backdrop-blur-lg shadow-lg rounded-xl p-10">
-                <form ref={ref} onSubmit={handleSubmit(onSubmit)} className={`w-full ${!loggedIn ? 'block' : 'hidden'}`}>
-                    <h2 className="text-center mb-8 text-3xl font-bold text-white">{component === 'login' ? "Login" : "Register"}</h2>
+        <div className="relative h-[calc(100vh-64px)] flex justify-center items-center bg-gradient-to-br from-blue-400 to-blue-600 px-4">
 
-                    <div>
+            {isLoading ? <div className="loader w-16 h-16 border-8 border-t-8 border-gray-200 border-t-blue-500 rounded-full animate-spin">
+            </div>
+                :
+                <div className="container mx-auto max-w-[480px] bg-white/30 backdrop-blur-lg shadow-lg rounded-xl p-6 sm:p-10">
+                    <form ref={ref} onSubmit={handleSubmit(onSubmit)} className={`w-full ${!loggedIn ? 'block' : 'hidden'}`}>
+                        <h2 className="text-center mb-8 text-2xl sm:text-3xl font-bold text-white">
+                            {component === 'login' ? "Login" : "Register"}
+                        </h2>
+
                         {component === 'register' && (
                             <div className="w-full mb-6">
                                 <input
                                     name="name"
                                     id="name"
                                     placeholder="Name"
-                                    className="w-full py-3 px-6 rounded-full text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
+                                    className="w-full py-3 px-6 rounded-full text-lg sm:text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
                                     type="text"
                                     {...register("name", { required: component === 'register' })}
                                 />
@@ -82,7 +89,7 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
                                 name="username"
                                 id="username"
                                 placeholder="Username"
-                                className="w-full py-3 px-6 rounded-full text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
+                                className="w-full py-3 px-6 rounded-full text-lg sm:text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
                                 type="text"
                                 {...register("username", {
                                     required: true,
@@ -98,7 +105,7 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
                                 name="password"
                                 id="password"
                                 placeholder="Password"
-                                className="w-full py-3 px-6 rounded-full text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
+                                className="w-full py-3 px-6 rounded-full text-lg sm:text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
                                 type="password"
                                 {...register("password", {
                                     required: true,
@@ -121,24 +128,24 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
 
                         <div className="w-full mb-6">
                             <input
-                                className='py-4 w-full text-center rounded-full bg-white text-blue-600 font-semibold shadow-lg text-xl cursor-pointer hover:bg-sky-200 transition-colors duration-300'
+                                className="py-4 w-full text-center rounded-full bg-white text-blue-600 font-semibold shadow-lg text-lg sm:text-xl cursor-pointer hover:bg-sky-200 transition-colors duration-300"
                                 disabled={isSubmitting}
                                 type="submit"
                                 value={component === 'register' ? "Register" : "Login"}
                             />
                         </div>
 
-                        <div className="text-center w-full text-lg text-white">
+                        <div className="text-center w-full text-sm sm:text-lg text-white">
                             <p>{component === 'register' ? "Already" : "Don't"} have an account? <Link className="text-sky-100 font-bold hover:underline hover:text-black transition-all duration-300 ease-in-out" href={component === 'register' ? "/login" : "/register"}>{component === 'register' ? "Login" : "Sign Up"}</Link></p>
                         </div>
-                    </div>
-                </form>
+                    </form>
 
-                <div className={`loggedIn text-center text-3xl ${loggedIn ? 'block' : 'hidden'}`}>
-                    {component === 'register' ? "Registered Successfully!!" : "Logged In Successfully!!"}
-                </div>
-            </div>
+                    <div className={`loggedIn text-center text-2xl sm:text-3xl ${loggedIn ? 'block' : 'hidden'}`}>
+                        {component === 'register' ? "Registered Successfully!!" : "Logged In Successfully!!"}
+                    </div>
+                </div>}
         </div>
+
     )
 }
 
