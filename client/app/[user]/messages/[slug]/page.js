@@ -42,7 +42,7 @@ const MessagePage = ({ params }) => {
   }, [targetUser.name])
 
   useEffect(() => {
-    socketRef.current = io('http://localhost:3001', { transports: ['websocket'] });
+    socketRef.current = io('https://next-js-chat-app.onrender.com/', { transports: ['websocket'] });
     if (userMe?.username)
       socketRef.current.emit("register", userMe?.username)
 
