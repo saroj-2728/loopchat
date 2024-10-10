@@ -3,8 +3,8 @@
 const Contact = () => {
     return (
         <>
-            <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] p-4">
-                <div className="flex flex-col items-center justify-center h-full">
+            <div className="w-full md:min-h-screen min-h-[calc(100vh-64px)] flex items-center justify-center px-4 md:px-0">
+                <div className="flex flex-col items-center justify-center md:mt-10 md:mb-10">
                     <h1 className="text-3xl font-bold mb-4 sm:text-4xl">Contact Me</h1>
                     <p className="mb-4 text-base sm:text-lg text-center">Feel free to reach out via the form below or connect with me on social media!</p>
 

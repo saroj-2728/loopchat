@@ -66,7 +66,7 @@ const MessagePage = ({ params }) => {
   }, [userMe]);
 
   useEffect(() => {
-    const delay = isMobileDevice() ? 400 : 10;
+    const delay = isMobileDevice() ? 200 : 10;
     setTimeout(() => {
       endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
     }, delay);
@@ -101,7 +101,7 @@ const MessagePage = ({ params }) => {
       <div ref={ref} className="messageSection overflow-auto flex-grow p-4 rounded-lg border border-gray-600 bg-gray-800">
         {messages.length > 0 ? (
           messages.map((msgObj, index) => (
-            <div key={index} className={`flex flex-col ${msgObj.mode === "sent" ? "items-start" : "items-end"} my-5`}>
+            <div key={index} className={`flex flex-col ${msgObj.mode === "sent" ? "items-end" : "items-start"} my-5`}>
               <span className={`text-sm ${msgObj.mode === "sent" ? "text-sky-400" : "text-gray-400"}`}>
                 {/* {msgObj.mode === "sent" ? "Me" : `${sender.name}`} */}
               </span>

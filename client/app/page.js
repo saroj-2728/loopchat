@@ -38,12 +38,12 @@ export default function Home() {
 
   return (
     <>
-      <div className='w-full h-[calc(100vh-64px)] flex items-center justify-center px-4 md:px-0'>
-        {isLoading ?
+      <div className='w-full md:min-h-screen min-h-[calc(100vh-64px)] flex items-center justify-center px-4 md:px-0'>
+        {isLoading ? (
           <div className="loader w-16 h-16 border-8 border-t-8 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
-          :
-          <div className='max-w-[1440px]'>
-            <section className="flex flex-col items-center text-center bg-gradient-to-r from-sky-500 to-indigo-600 text-white  px-6 py-12 md:px-16 md:py-20 rounded-lg shadow-lg">
+        ) : (
+          <div className='max-w-[1440px] md:mt-24 md:mb-24'>
+            <section className="flex flex-col items-center text-center bg-gradient-to-r from-sky-500 to-indigo-600 text-white px-6 py-12 md:px-16 md:py-20 rounded-lg shadow-lg">
               <h1 className="text-white text-3xl md:text-5xl font-bold mb-4">Connect Instantly, Chat Effortlessly</h1>
               <p className="text-white text-base md:text-lg mb-6">Real-time messaging, private conversations, and seamless interaction.</p>
               <button onClick={() => { router.push('/login') }} className="bg-white text-blue-600 font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-gray-200">
@@ -61,8 +61,9 @@ export default function Home() {
               </button>
             </section>
           </div>
-        }
+        )}
       </div>
+
     </>
   );
 }
