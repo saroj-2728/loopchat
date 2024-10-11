@@ -95,7 +95,9 @@ const MessagePage = ({ params }) => {
   return (
     <div className='relative h-full w-full flex flex-col bg-gray-900 md:p-4'>
       <div className="messageTo text-center pb-2 text-sky-600 font-bold text-2xl">
-        {targetUser.name}
+        {targetUser.name ? targetUser.name
+          :
+          <div className="loader w-8 h-8 border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto"></div>}
       </div>
 
       <div ref={ref} className="messageSection overflow-auto flex-grow p-4 rounded-lg border border-gray-600 bg-gray-800">
