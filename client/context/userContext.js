@@ -1,5 +1,6 @@
 "use client";
 import React, { createContext, useEffect, useState } from 'react';
+import connectDatabaseOnLanding from "@/serverActions/connectDatabase";
 
 export const UserContext = createContext();
 
@@ -18,14 +19,26 @@ export const UserProvider = ({ children }) => {
         return cookie ? decodeURIComponent(cookie.split('=')[1]) : null;
     };
 
+    const login = (username, name) => {
+        const loggedInUser = { username, name };
+        setUser(loggedInUser);
+        setCookie('user', JSON.stringify(loggedInUser), 7);
+        localStorage.setItem('isLoggedIn', "true");
+    }
+
     const logout = () => {
         setUser(null);
         document.cookie = `user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;// Delete user cookie
-        localStorage.removeItem('user');
+        localStorage.removeItem('isLoggedIn');
     };
 
     useEffect(() => {
-        const savedUser = getCookie('user') || localStorage.getItem('user');
+        connectDatabaseOnLanding()
+    }, [])
+    
+
+    useEffect(() => {
+        const savedUser = getCookie('user') || localStorage.getItem('isLoggedIn');
         if (savedUser) {
             setUser(JSON.parse(savedUser));
         }
@@ -33,16 +46,28 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         if (user && user.name && user.username) {
-            localStorage.setItem('user', JSON.stringify(user));
-            
+            localStorage.setItem('isLoggedIn', "true");
             // Save to cookies for 7 days
             setCookie('user', JSON.stringify(user), 7);
         }
     }, [user]);
 
+    useEffect(() => {
+        const checkCookie = () => {
+            const cookie = getCookie('user');
+            if (!cookie) {
+                setUser(null);
+                localStorage.removeItem('isLoggedIn')
+            }
+        };
+
+        const intervalId = setInterval(checkCookie, 60000); // Check every minute
+        return () => clearInterval(intervalId); // Cleanup the interval on unmount
+    }, []);
+
 
     return (
-        <UserContext.Provider value={{ user, setUser, logout }}>
+        <UserContext.Provider value={{ user, setUser, login, logout }}>
             {children}
         </UserContext.Provider>
     );

@@ -75,47 +75,52 @@ const MessagePage = ({ params }) => {
 
   const ref = useRef(null)
   const handleMessageSent = (e) => {
+    if (inputMessage.message.trim() === "") {
+      setInputMessage({ mode: "", message: "" })
+      return;
+    }
     setMessages((prevMessages) => [...prevMessages, {
       mode: "sent",
       message: inputMessage.message
     }]);
-    if (inputMessage.message.trim()) {
-      socketRef.current.emit('privateMessage', {
-        inputMessage: inputMessage.message,
-        sender: {
-          username: userMe.username,
-          name: userMe.name
-        },
-        receiverId: targetUser.username
-      }); // Send message to the server
-      setInputMessage({ mode: "", message: "" });
-    }
+
+    socketRef.current.emit('privateMessage', {
+      inputMessage: inputMessage.message,
+      sender: {
+        username: userMe.username,
+        name: userMe.name
+      },
+      receiverId: targetUser.username
+    }); // Send message to the server
+    setInputMessage({ mode: "", message: "" });
+
   }
 
   return (
-    <div className='relative h-full w-full flex flex-col bg-gray-900 md:p-4'>
-      <div className="messageTo text-center pb-2 text-sky-600 font-bold text-2xl">
+    <div className='relative h-full w-full flex flex-col md:p-4'>
+
+      <div className="messageTo text-center pb-2 text-[#ff7043] font-bold text-2xl">
         {targetUser.name ? targetUser.name
           :
           <div className="loader w-8 h-8 border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto"></div>}
       </div>
 
-      <div ref={ref} className="messageSection overflow-auto flex-grow p-4 rounded-lg border border-gray-600 bg-gray-800">
+      <div ref={ref} className="messageSection overflow-auto flex-grow p-4 rounded-lg border border-gray-600 bg-black/30">
         {messages.length > 0 ? (
           messages.map((msgObj, index) => (
             <div key={index} className={`flex flex-col ${msgObj.mode === "sent" ? "items-end" : "items-start"} my-5`}>
               <span className={`text-sm ${msgObj.mode === "sent" ? "text-sky-400" : "text-gray-400"}`}>
-                {/* {msgObj.mode === "sent" ? "Me" : `${sender.name}`} */}
               </span>
-              <span className={`rounded-xl py-2 px-5 text-lg ${msgObj.mode === "sent" ? "bg-sky-600" : "bg-gray-600"} text-white`}>
+              <span className={`rounded-xl py-2 px-5 text-lg ${msgObj.mode === "sent" ? "bg-sky-600" : "bg-gray-600/50"} text-white`}>
                 {msgObj.message}
               </span>
             </div>
           ))
-        ) : (
-          <p className="text-gray-500 text-center">No messages yet.</p>
+        )
+         : 
+         (
+          <p className="text-gray-200 text-center">No messages yet.</p>
         )}
-        {/* This div is the target for scrolling */}
         <div ref={endOfMessagesRef} />
       </div>
 
@@ -129,16 +134,16 @@ const MessagePage = ({ params }) => {
             placeholder='Type Your Message Here'
             onKeyDown={(e) => { if (e.key === "Enter") handleMessageSent(); }}
             onChange={(e) => setInputMessage({ mode: "", message: e.target.value })}
-            className='py-4 pl-6 pr-24 w-full text-lg box-border rounded-full border border-sky-600 text-white bg-black placeholder-gray-400'
+            className='py-4 pl-6 pr-24 w-full text-lg box-border rounded-full border border-[#ff7043] text-white bg-transparent placeholder-white focus:border-[#ff7043]'
           />
           <button
             onClick={handleMessageSent}
-            className='absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-600 text-white py-2 px-4 rounded-full transition duration-300 hover:bg-blue-500'>
+            className='absolute top-1/2 right-4 transform -translate-y-1/2 bg-[#ff5722] text-white py-2 px-4 rounded-full transition duration-300 md:font-bold'>
             Send
           </button>
         </div>
       </div>
-      <p className='text-center mt-1 md:-mb-7 text-gray-500 text-xs md:text-base'>Messages are deleted as soon as you leave this message page.</p>
+      <p className='text-center mt-1 md:-mb-6 text-gray-200 text-xs md:text-base'>Messages are deleted as soon as you leave this message page.</p>
     </div>
 
   );

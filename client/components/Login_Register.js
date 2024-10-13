@@ -15,13 +15,7 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
-    const errorStyle = {
-        color: "red",
-        textAlign: "center",
-        marginTop: "10px"
-    }
-
-    const { setUser } = useContext(UserContext);
+    const { login } = useContext(UserContext);
     const onSubmit = async (data) => {
         ref.current.reset();
         setLoading(true)
@@ -31,19 +25,9 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
         if (result?.success) {
             setloggedIn(true)
             if (component === 'login') {
-                const loggedInUser = {
-                    name: result.userData.name,
-                    username: result.userData.username
-                };
-                setUser(loggedInUser);
-                const setCookie = (name, value, days) => {
-                    const expires = new Date(Date.now() + days * 864e5).toUTCString();
-                    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-                };
-                setCookie('user', JSON.stringify(loggedInUser), 7);
+                login(result.userData.username, result.userData.name)
             }
 
-            await delay(1)
             router.push(component === 'login' ? "/home" : "/login");
         } else {
             setLoading(false)
@@ -51,23 +35,18 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
         }
     };
 
-    const delay = (seconds) => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve()
-            }, seconds * 1000);
-        })
-    }
 
     return (
-        <div className="relative h-[calc(100vh-64px)] flex justify-center items-center bg-gradient-to-br from-blue-400 to-blue-600 px-4">
+        <div className="relative h-[calc(100vh-64px)] flex justify-center items-center px-4">
 
             {isLoading ? <div className="loader w-16 h-16 border-8 border-t-8 border-gray-200 border-t-blue-500 rounded-full animate-spin">
             </div>
                 :
-                <div className="container mx-auto max-w-[480px] bg-white/30 backdrop-blur-lg shadow-lg rounded-xl p-6 sm:p-10">
+                <div className="container mx-auto max-w-[480px] bg-[#1e1e1e] backdrop-blur-lg shadow-custom rounded-xl p-6 sm:p-10">
+
                     <form ref={ref} onSubmit={handleSubmit(onSubmit)} className={`w-full ${!loggedIn ? 'block' : 'hidden'}`}>
-                        <h2 className="text-center mb-8 text-2xl sm:text-3xl font-bold text-white">
+
+                        <h2 className="text-center mb-8 text-2xl sm:text-3xl font-bold text-[#ff7043]">
                             {component === 'login' ? "Login" : "Register"}
                         </h2>
 
@@ -77,7 +56,7 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
                                     name="name"
                                     id="name"
                                     placeholder="Name"
-                                    className="w-full py-3 px-6 rounded-full text-lg sm:text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
+                                    className="w-full py-3 px-6 rounded-full text-lg sm:text-xl bg-[#2c2c2c] text-gray-200 border border-gray-600 focus:outline-none focus:border-blue-500"
                                     type="text"
                                     {...register("name", { required: component === 'register' })}
                                 />
@@ -89,7 +68,7 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
                                 name="username"
                                 id="username"
                                 placeholder="Username"
-                                className="w-full py-3 px-6 rounded-full text-lg sm:text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
+                                className="w-full py-3 px-6 rounded-full text-lg sm:text-xl bg-[#2c2c2c] text-gray-200 border border-gray-600 focus:outline-none focus:border-blue-500"
                                 type="text"
                                 {...register("username", {
                                     required: true,
@@ -97,6 +76,7 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
                                     validate: value => !/\s/g.test(value) || 'No spaces allowed in username',
                                 })}
                             />
+
                             {errors.username && <div className="text-red-500 text-center mt-2">{errors.username.message}</div>}
                         </div>
 
@@ -105,30 +85,34 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
                                 name="password"
                                 id="password"
                                 placeholder="Password"
-                                className="w-full py-3 px-6 rounded-full text-lg sm:text-xl bg-white/80 text-gray-700 border border-gray-300 focus:outline-none focus:border-blue-500"
+                                className="w-full py-3 px-6 rounded-full text-lg sm:text-xl  bg-[#2c2c2c] text-gray-200 border border-gray-600 focus:outline-none focus:border-blue-500"
                                 type="password"
                                 {...register("password", {
                                     required: true,
                                     minLength: { value: 8, message: "Password must be at least 8 characters long!" },
                                 })}
                             />
+                            
                             {errors.password && <div className="text-red-500 text-center mt-2">{errors.password.message}</div>}
+
                             {errorMessage && <div className="text-red-500 text-center mt-2">{errorMessage}</div>}
                         </div>
 
                         {component === 'login' && (
                             <div className="flex justify-between items-center mb-6">
+
                                 <div className="flex items-center">
-                                    <input type="checkbox" id="remember" name="remember" className="mr-2" />
-                                    <label htmlFor="remember" className="text-white">Remember Me</label>
+                                    <input type="checkbox" id="remember" name="remember" className="mr-2 cursor-pointer" />
+                                    <label htmlFor="remember" className="text-white cursor-pointer">Remember Me</label>
                                 </div>
-                                <Link href="/" className="text-white hover:underline hover:text-black transition-all duration-300 ease-in-out">Forgot Password?</Link>
+
+                                <Link href="/" className="text-white hover:underline hover:text-[#ff5722] transition-all duration-300 ease-in-out">Forgot Password?</Link>
                             </div>
                         )}
 
                         <div className="w-full mb-6">
                             <input
-                                className="py-4 w-full text-center rounded-full bg-white text-blue-600 font-semibold shadow-lg text-lg sm:text-xl cursor-pointer hover:bg-sky-200 transition-colors duration-300"
+                                className="py-4 w-full text-center rounded-full bg-[#ff7043] hover:bg-[#ff5722] text-white  font-semibold shadow-lg text-lg sm:text-xl cursor-pointer  transition-colors duration-300"
                                 disabled={isSubmitting}
                                 type="submit"
                                 value={component === 'register' ? "Register" : "Login"}
@@ -136,7 +120,7 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
                         </div>
 
                         <div className="text-center w-full text-sm sm:text-lg text-white">
-                            <p>{component === 'register' ? "Already" : "Don't"} have an account? <Link className="text-sky-100 font-bold hover:underline hover:text-black transition-all duration-300 ease-in-out" href={component === 'register' ? "/login" : "/register"}>{component === 'register' ? "Login" : "Sign Up"}</Link></p>
+                            <p>{component === 'register' ? "Already" : "Don't"} have an account? <Link className="text-sky-100 font-bold hover:underline hover:text-[#ff5722] transition-all duration-300 ease-in-out" href={component === 'register' ? "/login" : "/register"}>{component === 'register' ? "Login" : "Sign Up"}</Link></p>
                         </div>
                     </form>
 

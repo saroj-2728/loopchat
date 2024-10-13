@@ -59,6 +59,7 @@ const Navbar = () => {
         <div className="sticky top-0 z-20">
             <nav className="bg-gray-800">
                 <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+
                     <div className="relative flex h-16 items-center justify-between">
                         {/* Mobile menu button */}
                         <button
@@ -124,10 +125,10 @@ const Navbar = () => {
 
 
                             {isPopupVisible && (
-                                <div ref={popupRef} className="absolute right-0 z-10 mt-2 w-48 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                                    <a href="#" onClick={togglePopup} className="block px-4 py-2 text-sm text-gray-700">Your Profile</a>
-                                    <a href="#" onClick={togglePopup} className="block px-4 py-2 text-sm text-gray-700">Settings</a>
-                                    <p href="#" onClick={handleLogoutClick} className="block px-4 py-2 text-sm text-gray-700 cursor-pointer">Sign out</p>
+                                <div ref={popupRef} className="absolute right-0 z-10 mt-2 w-48 bg-[#1e1e1e] shadow-lg rounded-lg ring-1 ring-black ring-opacity-5">
+                                    <a href="#" onClick={togglePopup} className="block px-4 py-2 text-sm text-gray-200">Your Profile</a>
+                                    <a href="#" onClick={togglePopup} className="block px-4 py-2 text-sm text-gray-200">Settings</a>
+                                    <p href="#" onClick={handleLogoutClick} className="block px-4 py-2 text-sm text-gray-200 cursor-pointer">Sign out</p>
                                 </div>
                             )}
                         </div>
