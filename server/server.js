@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);  // Create a server 
 const io = new Server(server, {
   cors: {
-    origin: 'https://next-js-chat-app-5lgs.vercel.app/',
+    origin: 'https://next-js-chat-app-5lgs.vercel.app',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type']
   }
@@ -15,7 +15,7 @@ const io = new Server(server, {
 
 
 app.use(cors({
-  origin: 'https://next-js-chat-app-5lgs.vercel.app/',
+  origin: 'https://next-js-chat-app-5lgs.vercel.app',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 }));
 
