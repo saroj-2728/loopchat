@@ -1,18 +1,18 @@
 "use client"
 import React, { useEffect, useState, useRef, useContext } from 'react'
-import { usersArray } from '@/serverActions/handleUsers'
 import { io } from 'socket.io-client';
 import { UserContext } from '@/context/userContext';
+import { AllUsersContext } from '@/context/allUsersContext';
 import { useRouter } from 'next/navigation';
 
 const MessagePage = ({ params }) => {
 
   const { user: userMe } = useContext(UserContext);
+  const { allUsers } = useContext(AllUsersContext)
   const router = useRouter()
   const socketRef = useRef(null);
   const endOfMessagesRef = useRef(null);
   const [targetUser, settargetUser] = useState([]);
-  const [error, setError] = useState(null);
   const [sender, setSender] = useState({})
   const [inputMessage, setInputMessage] = useState({ mode: "", message: "" })
   const [messages, setMessages] = useState([])
@@ -22,31 +22,23 @@ const MessagePage = ({ params }) => {
   };
 
   useEffect(() => {
-    if (!userMe) return;
-
-    const fetchUsersName = async () => {
-      try {
-        const data = await usersArray("all");
-        const theUser = data.find((user) => user.username === params.slug)
+    if (allUsers.length === 0) return;
+    const fetchUsersName = () => {
+        const theUser = allUsers.find((user) => user.username === params.slug)
         if (theUser)
           settargetUser(theUser)
         else
           userMe ? router.push(`/${userMe?.username}/messages`) : "";
-
-      } catch (err) {
-        setError("Failed to fetch user.");
-        console.error(err);
-      }
     };
     fetchUsersName();
-  }, [userMe, params.slug, router]);
+  }, [allUsers, params.slug, router, userMe]);
 
   useEffect(() => {
     document.title = `Message ${targetUser.name}`
   }, [targetUser.name])
 
   useEffect(() => {
-    socketRef.current = io('https://next-js-chat-app.onrender.com/', { transports: ['websocket'] });
+    socketRef.current = io('https://next-js-chat-app.onrender.com');
     if (userMe?.username)
       socketRef.current.emit("register", userMe?.username)
 
@@ -59,7 +51,6 @@ const MessagePage = ({ params }) => {
       }]);
     });
 
-    // Cleanup on unmount
     return () => {
       socketRef.current.disconnect();
     };
@@ -109,18 +100,16 @@ const MessagePage = ({ params }) => {
         {messages.length > 0 ? (
           messages.map((msgObj, index) => (
             <div key={index} className={`flex flex-col ${msgObj.mode === "sent" ? "items-end" : "items-start"} my-5`}>
-              <span className={`text-sm ${msgObj.mode === "sent" ? "text-sky-400" : "text-gray-400"}`}>
-              </span>
-              <span className={`rounded-xl py-2 px-5 text-lg ${msgObj.mode === "sent" ? "bg-sky-600" : "bg-gray-600/50"} text-white`}>
+              <span className={`rounded-xl py-2 px-5 text-lg ${msgObj.mode === "sent" ? "bg-[#ff7043]" : "bg-gray-600/50"} text-white`}>
                 {msgObj.message}
               </span>
             </div>
           ))
         )
-         : 
-         (
-          <p className="text-gray-200 text-center">No messages yet.</p>
-        )}
+          :
+          (
+            <p className="text-gray-200 text-center">No messages yet.</p>
+          )}
         <div ref={endOfMessagesRef} />
       </div>
 

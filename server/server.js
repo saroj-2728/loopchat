@@ -9,8 +9,7 @@ const io = new Server(server, {
   cors: {
     origin: 'https://next-js-chat-app-5lgs.vercel.app/',
     methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type'],
-    transports: ['websocket']
+    allowedHeaders: ['Content-Type']
   }
 });
 

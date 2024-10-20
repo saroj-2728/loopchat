@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@/context/userContext';
 
-const Login_Register = ({ component, handleData, laterMessage }) => {
+const Login_Register = ({ component, handleData }) => {
 
     const router = useRouter()
     const [errorMessage, setErrorMessage] = useState("")
@@ -39,7 +39,9 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
     return (
         <div className="relative h-[calc(100vh-64px)] flex justify-center items-center px-4">
 
-            {isLoading ? <div className="loader w-16 h-16 border-8 border-t-8 border-gray-200 border-t-blue-500 rounded-full animate-spin">
+            {isLoading ? <div className="w-full max-w-sm h-64 flex flex-col gap-3 items-center justify-center bg-black rounded-lg shadow-small">
+                <div className="loader w-16 h-16 border-8 border-t-8 border-gray-200 border-t-[#ff5722] rounded-full animate-spin-slow"></div>
+                <p className='text-2xl font-semibold'>Please Wait</p>
             </div>
                 :
                 <div className="container mx-auto max-w-[480px] bg-[#1e1e1e] backdrop-blur-lg shadow-custom rounded-xl p-6 sm:p-10">
@@ -73,7 +75,10 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
                                 {...register("username", {
                                     required: true,
                                     minLength: { value: 3, message: "Username must be at least 3 characters long!" },
-                                    validate: value => !/\s/g.test(value) || 'No spaces allowed in username',
+                                    validate: {
+                                        noSpaces: value => !/\s/g.test(value) || 'No spaces allowed in username',
+                                        isLowercase: value => value === value.toLowerCase() || 'Username must be lowercase only'
+                                    },
                                 })}
                             />
 
@@ -92,7 +97,7 @@ const Login_Register = ({ component, handleData, laterMessage }) => {
                                     minLength: { value: 8, message: "Password must be at least 8 characters long!" },
                                 })}
                             />
-                            
+
                             {errors.password && <div className="text-red-500 text-center mt-2">{errors.password.message}</div>}
 
                             {errorMessage && <div className="text-red-500 text-center mt-2">{errorMessage}</div>}

@@ -61,8 +61,8 @@ export const UserProvider = ({ children }) => {
             }
         };
 
-        const intervalId = setInterval(checkCookie, 60000); // Check every minute
-        return () => clearInterval(intervalId); // Cleanup the interval on unmount
+        const intervalId = setInterval(checkCookie, 60000);
+        return () => clearInterval(intervalId);
     }, []);
 
 

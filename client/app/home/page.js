@@ -21,8 +21,11 @@ const Home = () => {
     return (
         <>
             <div className="flex flex-col min-h-screen items-center justify-center px-4">
-                {loading ? <div className="loader w-16 h-16 border-8 border-t-8 border-gray-200 border-t-blue-500 rounded-full animate-spin">
-                </div> :
+                {loading ? <div className="w-full max-w-sm h-64 flex flex-col gap-3 items-center justify-center bg-black rounded-lg shadow-small">
+                    <div className="loader w-16 h-16 border-8 border-t-8 border-gray-200 border-t-[#ff5722] rounded-full animate-spin-slow"></div>
+                    <p className='text-2xl font-semibold'>Please Wait</p>
+                </div>
+                    :
                     <div className="bg-[#1e1e1e] shadow-custom rounded-lg p-6 sm:p-8 md:p-10 text-center flex flex-col gap-4 w-full max-w-md">
                         <h1 className="text-3xl sm:text-4xl font-bold text-[#ff7043]">
                             Welcome, {user?.name || "User"}!

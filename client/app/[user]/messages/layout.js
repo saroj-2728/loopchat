@@ -1,37 +1,24 @@
 "use client"
-import { usersArray } from "@/serverActions/handleUsers";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useContext } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { UserContext } from "@/context/userContext";
+import { AllUsersContext } from "@/context/allUsersContext";
 
 export default function RootLayout({ children }) {
 
     const { user: userMe } = useContext(UserContext)
+    const { allUsers } = useContext(AllUsersContext)
     const router = useRouter()
     const pathname = usePathname()
-    const [users, setUsers] = useState([]);
-    const [error, setError] = useState(null);
     const messagePageRegex = /^\/([^/]+)\/messages\/([^/]+)$/;
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const data = await usersArray("all");
-                setUsers(data);
-            } catch (err) {
-                setError("Failed to fetch users.");
-                console.error(err);
-            }
-        };
-        fetchUsers();
-    }, []);
 
     useEffect(() => {
         document.title = 'Messages'
     }, [])
 
 
-    const handleUserMessaging = (users) => {
-        router.push(`/${userMe.username}/messages/${users.username}`);
+    const handleUserMessaging = (user) => {
+        router.push(`/${userMe.username}/messages/${user.username}`);
     }
 
     return (
@@ -45,18 +32,18 @@ export default function RootLayout({ children }) {
                             <h1 className="text-xl md:text-2xl mt-2 md:mb-2 font-bold text-[#ff7043]">Pick a User to Message!</h1>
 
                             <div className="users mt-4 overflow-y-auto flex-grow">
-                                {users.length > 0 ? (
-                                    users.map((user) => (
+                                {allUsers.length > 0 ? (
+                                    allUsers.map((user) => (
                                         <div
                                             key={user._id}
-                                            className="border border-[#ff7043] py-1  rounded-xl my-2 cursor-pointer transition duration-[650ms] hover:bg-[#ff5722] text-white"
+                                            className={`border border-[#ff7043] py-1  rounded-xl my-2 cursor-pointer transition duration-[650ms] hover:bg-[#ff5722] text-white ${pathname.split('/')[3] === user.username ? "bg-[#ff5722]" : ""}`}
                                             onClick={() => handleUserMessaging(user)}
                                         >
                                             <div className="text-xl">
                                                 {`${user.name}`}
                                             </div>
                                             <div
-                                            className="text-sm">
+                                                className="text-sm">
                                                 {`(${user.username})`}
                                             </div>
                                         </div>

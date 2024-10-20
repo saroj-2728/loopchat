@@ -22,7 +22,10 @@ export default function Home() {
     <>
       <div className='w-full md:min-h-screen min-h-[calc(100vh-64px)] flex items-center justify-center px-4 md:px-0'>
         {isLoading ? (
-          <div className="loader w-16 h-16 border-8 border-t-8 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
+          <div className="w-full max-w-sm h-64 flex flex-col gap-3 items-center justify-center bg-black rounded-lg shadow-small">
+            <div className="loader w-16 h-16 border-8 border-t-8 border-gray-200 border-t-[#ff5722] rounded-full animate-spin-slow"></div>
+            <p className='text-2xl font-semibold'>Please Wait</p>
+          </div>
         ) : (
           <div className='max-w-[1440px] md:mt-24 md:mb-24'>
 

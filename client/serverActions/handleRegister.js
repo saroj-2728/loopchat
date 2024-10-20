@@ -21,6 +21,7 @@ export const handleRegister = async (dataObj) => {
             password
         })
         await newUser.save()
+
         return {
             success: true,
             message: "Registered Succssfully!"

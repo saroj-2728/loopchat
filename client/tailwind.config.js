@@ -15,6 +15,9 @@ module.exports = {
         'custom': `3px 3px 40px rgba(0, 0, 0, 0.9)`,
         'small': `3px 3px 20px rgba(0, 0, 0, 0.9)`,
       },
+      animation: {
+        'spin-slow': 'spin 1.5s linear infinite',
+      },
     },
   },
   plugins: [],
