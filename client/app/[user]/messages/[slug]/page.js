@@ -1,18 +1,18 @@
 "use client"
 import React, { useEffect, useState, useRef, useContext } from 'react'
-import { io } from 'socket.io-client';
 import { UserContext } from '@/context/userContext';
 import { AllUsersContext } from '@/context/allUsersContext';
 import { useRouter } from 'next/navigation';
+import { useSocket } from '@/context/socketContext';
 
 const MessagePage = ({ params }) => {
 
   const { user: userMe } = useContext(UserContext);
   const { allUsers } = useContext(AllUsersContext)
   const router = useRouter()
-  const socketRef = useRef(null);
+  const socketRef = useSocket()
   const endOfMessagesRef = useRef(null);
-  const [targetUser, settargetUser] = useState([]);
+  const [targetUser, settargetUser] = useState({});
   const [sender, setSender] = useState({})
   const [inputMessage, setInputMessage] = useState({ mode: "", message: "" })
   const [messages, setMessages] = useState([])
@@ -24,11 +24,11 @@ const MessagePage = ({ params }) => {
   useEffect(() => {
     if (allUsers.length === 0) return;
     const fetchUsersName = () => {
-        const theUser = allUsers.find((user) => user.username === params.slug)
-        if (theUser)
-          settargetUser(theUser)
-        else
-          userMe ? router.push(`/${userMe?.username}/messages`) : "";
+      const theUser = allUsers.find((user) => user.username === params.slug)
+      if (theUser)
+        settargetUser(theUser)
+      else
+        userMe ? router.push(`/${userMe?.username}/messages`) : "";
     };
     fetchUsersName();
   }, [allUsers, params.slug, router, userMe]);
@@ -38,23 +38,21 @@ const MessagePage = ({ params }) => {
   }, [targetUser.name])
 
   useEffect(() => {
-    socketRef.current = io('https://next-js-chat-app.onrender.com');
-    if (userMe?.username)
-      socketRef.current.emit("register", userMe?.username)
-
     // Listen for incoming messages 
-    socketRef.current.on('privateMessage', (data) => {
-      setSender(data.sender)
-      setMessages((prevMessages) => [...prevMessages, {
-        mode: "received",
-        message: data.inputMessage
-      }]);
+    socketRef.current?.on('privateMessage', (data) => {
+      if (data.sender.username === targetUser.username && userMe.username === data.receiverId) {
+        setSender(data.sender)
+        setMessages((prevMessages) => [...prevMessages, {
+          mode: "received",
+          message: data.inputMessage
+        }]);
+      }
     });
 
     return () => {
-      socketRef.current.disconnect();
+      socketRef.current?.off('privateMessage');
     };
-  }, [userMe]);
+  }, [userMe, targetUser]);
 
   useEffect(() => {
     const delay = isMobileDevice() ? 200 : 10;
@@ -82,7 +80,7 @@ const MessagePage = ({ params }) => {
         name: userMe.name
       },
       receiverId: targetUser.username
-    }); // Send message to the server
+    });
     setInputMessage({ mode: "", message: "" });
 
   }

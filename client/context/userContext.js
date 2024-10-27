@@ -1,6 +1,5 @@
 "use client";
 import React, { createContext, useEffect, useState } from 'react';
-import connectDatabaseOnLanding from "@/serverActions/connectDatabase";
 
 export const UserContext = createContext();
 
@@ -30,12 +29,7 @@ export const UserProvider = ({ children }) => {
         setUser(null);
         document.cookie = `user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;// Delete user cookie
         localStorage.removeItem('isLoggedIn');
-    };
-
-    useEffect(() => {
-        connectDatabaseOnLanding()
-    }, [])
-    
+    };    
 
     useEffect(() => {
         const savedUser = getCookie('user') || localStorage.getItem('isLoggedIn');

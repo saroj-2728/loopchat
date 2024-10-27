@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { UserProvider } from '@/context/userContext';
 import AllUsersProvider from "@/context/allUsersContext";
+import { SocketProvider } from "@/context/socketContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,10 +28,12 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <UserProvider>
-          <Navbar />
-          <AllUsersProvider>
-            {children}
-          </AllUsersProvider>
+          <SocketProvider>
+            <Navbar />
+            <AllUsersProvider>
+              {children}
+            </AllUsersProvider>
+          </SocketProvider>
         </UserProvider>
 
       </body>

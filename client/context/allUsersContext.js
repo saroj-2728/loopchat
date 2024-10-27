@@ -1,23 +1,27 @@
 "use client"
 import { createContext, useEffect, useState } from "react";
-import { usersArray } from "@/serverActions/handleUsers";
+import { useSocket } from "./socketContext";
 
 export const AllUsersContext = createContext()
 
 const AllUsersProvider = ({ children }) => {
 
+    const socketRef = useSocket()
     const [allUsers, setAllUsers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null);
     useEffect(() => {
-        let usersLength = 0;
         const fetchUsers = async () => {
             try {
-                const data = await usersArray();
-                const hasChanged = usersLength !== data.length
-                if (!hasChanged) return;
+                const response = await fetch(`http://localhost:3001/api/users`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ data: "Users" })
+                })
+                const data = await response.json()
                 setAllUsers(data)
-                usersLength = data.length;
                 setLoading(false)
 
             } catch (err) {
@@ -28,12 +32,16 @@ const AllUsersProvider = ({ children }) => {
         };
         fetchUsers();
 
-        const intervalId = setInterval(fetchUsers, 10000);
+        if (socketRef.current) {
+            socketRef.current.on("newUserSignUp", () => {
+                fetchUsers();
+            });
+        }
 
         return () => {
-            clearInterval(intervalId)
+            socketRef.current?.off("newUserSignUp");
         };
-    }, []);
+    }, [socketRef.current]);
 
     return (
         <AllUsersContext.Provider value={{ allUsers, setAllUsers, loading }}>

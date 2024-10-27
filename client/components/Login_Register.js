@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@/context/userContext';
 
-const Login_Register = ({ component, handleData }) => {
+const Login_Register = ({ component }) => {
 
     const router = useRouter()
     const [errorMessage, setErrorMessage] = useState("")
@@ -20,7 +20,15 @@ const Login_Register = ({ component, handleData }) => {
         ref.current.reset();
         setLoading(true)
 
-        const result = await handleData(data)
+        const apiPath = component === "login" ? "api/auth/login" : "api/auth/register";
+        const response = await fetch(`http://localhost:3001/${apiPath}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        const result = await response.json()
 
         if (result?.success) {
             setloggedIn(true)

@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
+dotenv.config({ path: '.env.local' });
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
@@ -10,8 +12,12 @@ async function connectToDatabase() {
     if (mongoose.connection.readyState === 1) {
         return mongoose.connection;
     }
-    let conn = await mongoose.connect(MONGODB_URI)
-    return conn;
+    try {
+        let conn = await mongoose.connect(MONGODB_URI)
+        return conn;
+    } catch (err) {
+        console.error("MongoDB Connection Error: ", err);
+    }
 }
 
 export default connectToDatabase;
