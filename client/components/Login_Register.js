@@ -21,7 +21,7 @@ const Login_Register = ({ component }) => {
         setLoading(true)
 
         const apiPath = component === "login" ? "api/auth/login" : "api/auth/register";
-        const response = await fetch(`http://localhost:3001/${apiPath}`, {
+        const response = await fetch(`https://next-js-chat-app.onrender.com/${apiPath}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

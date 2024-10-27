@@ -38,8 +38,10 @@ const MessagePage = ({ params }) => {
   }, [targetUser.name])
 
   useEffect(() => {
+    const socket = socketRef.current; 
+
     // Listen for incoming messages 
-    socketRef.current?.on('privateMessage', (data) => {
+    socket?.on('privateMessage', (data) => {
       if (data.sender.username === targetUser.username && userMe.username === data.receiverId) {
         setSender(data.sender)
         setMessages((prevMessages) => [...prevMessages, {
@@ -50,9 +52,9 @@ const MessagePage = ({ params }) => {
     });
 
     return () => {
-      socketRef.current?.off('privateMessage');
+      socket?.off('privateMessage');
     };
-  }, [userMe, targetUser]);
+  }, [userMe, targetUser, socketRef]);
 
   useEffect(() => {
     const delay = isMobileDevice() ? 200 : 10;

@@ -5,8 +5,7 @@ let io;
 export const initSocket = (server) => {
     io = new Server(server, {
         cors: {
-            // origin: 'https://next-js-chat-app-5lgs.vercel.app',
-            origin: 'http://localhost:3000',
+            origin: 'https://next-js-chat-app-5lgs.vercel.app',
             methods: ['GET', 'POST'],
             allowedHeaders: ['Content-Type']
           }

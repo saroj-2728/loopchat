@@ -8,8 +8,7 @@ const app = express();
 app
     .use(express.json())
     .use(cors({
-        // origin: 'https://next-js-chat-app-5lgs.vercel.app',
-        origin: 'http://localhost:3000',
+        origin: 'https://next-js-chat-app-5lgs.vercel.app',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     }));
 
