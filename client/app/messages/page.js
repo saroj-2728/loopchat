@@ -12,7 +12,7 @@ const Messages = () => {
         <>
 
             <div className='md:flex hidden justify-center items-center h-full w-full text-2xl'>
-                No User Selected
+            Send private messages to any friend.
             </div>
         </>
     )

@@ -3,7 +3,12 @@ import React, { useEffect, useState, useRef, useContext } from 'react'
 import { UserContext } from '@/context/userContext';
 import { AllUsersContext } from '@/context/allUsersContext';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useSocket } from '@/context/socketContext';
+import Loader from '@/components/Loader';
+import DefaultProfile from '@/utilities/DefaultProfile';
+import { GoArrowLeft } from "react-icons/go";
 
 const MessagePage = ({ params }) => {
 
@@ -16,6 +21,7 @@ const MessagePage = ({ params }) => {
   const [sender, setSender] = useState({})
   const [inputMessage, setInputMessage] = useState({ mode: "", message: "" })
   const [messages, setMessages] = useState([])
+  const defaultProfileSrc = DefaultProfile()
 
   const isMobileDevice = () => {
     return window.innerWidth < 768;
@@ -38,7 +44,7 @@ const MessagePage = ({ params }) => {
   }, [targetUser.name])
 
   useEffect(() => {
-    const socket = socketRef.current; 
+    const socket = socketRef.current;
 
     // Listen for incoming messages 
     socket?.on('privateMessage', (data) => {
@@ -88,19 +94,38 @@ const MessagePage = ({ params }) => {
   }
 
   return (
-    <div className='relative h-full w-full flex flex-col md:p-4'>
+    <div className='relative h-full w-full flex flex-col'>
 
-      <div className="messageTo text-center pb-2 text-[#ff7043] font-bold text-2xl">
+      <div className="messageTo w-full flex flex-row items-center justify-start gap-3 text-center text-white font-medium text-base md:text-xl border-b border-white/20 py-2 md:py-4 px-4">
+
+        <Link
+          href={'/messages'}
+          className="md:hidden"
+        >
+          <GoArrowLeft className=" w-7 h-7" />
+        </Link>
+        <div className='flex justify-center w-[30px] h-[30px] md:w-[50px] md:h-[50px]'>
+          <Image
+            src={targetUser?.profileImage?.url || defaultProfileSrc}
+            width={50}
+            height={50}
+            alt='User Profile'
+            className="rounded-full"
+          />
+        </div>
         {targetUser.name ? targetUser.name
           :
-          <div className="loader w-8 h-8 border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto"></div>}
+          <Loader size={'h-8 w-8'} text={''} />}
       </div>
 
-      <div ref={ref} className="messageSection overflow-auto flex-grow p-4 rounded-lg border border-gray-600 bg-black/30">
+      <div ref={ref} className="messageSection w-full overflow-auto flex-grow rounded-lg px-4 md:px-6">
         {messages.length > 0 ? (
           messages.map((msgObj, index) => (
-            <div key={index} className={`flex flex-col ${msgObj.mode === "sent" ? "items-end" : "items-start"} my-5`}>
-              <span className={`rounded-xl py-2 px-5 text-lg ${msgObj.mode === "sent" ? "bg-[#ff7043]" : "bg-gray-600/50"} text-white`}>
+            <div
+              key={index}
+              className={`flex flex-col ${msgObj.mode === "sent" ? "items-end" : "items-start"} my-5`}
+            >
+              <span className={`rounded-xl md:py-2 py-1 px-4 md:px-5 text-lg ${msgObj.mode === "sent" ? "bg-sky-500" : "bg-gray-600/50"} text-white`}>
                 {msgObj.message}
               </span>
             </div>
@@ -108,31 +133,30 @@ const MessagePage = ({ params }) => {
         )
           :
           (
-            <p className="text-gray-200 text-center">No messages yet.</p>
+            <p className="text-gray-200 text-center mt-4">No messages yet.</p>
           )}
         <div ref={endOfMessagesRef} />
       </div>
 
-      <div className='messageBox flex items-center justify-center mt-4'>
-        <div className='w-full max-w-md relative'>
+      <div className='w-full messageBox flex items-center justify-center my-4 px-4'>
+        <div className='w-full max-w-2xl relative'>
           <input
             id='message'
             name='message'
             type="text"
             value={inputMessage.message}
-            placeholder='Type Your Message Here'
+            placeholder='Message...'
             onKeyDown={(e) => { if (e.key === "Enter") handleMessageSent(); }}
             onChange={(e) => setInputMessage({ mode: "", message: e.target.value })}
-            className='py-4 pl-6 pr-24 w-full text-lg box-border rounded-full border border-[#ff7043] text-white bg-transparent placeholder-white focus:border-[#ff7043]'
+            className='py-3 md:py-[14px] pl-6 pr-24 w-full text-sm md:text-lg box-border rounded-full border border-gray-200/30 text-white bg-transparent placeholder-white/50'
           />
-          <button
+          {inputMessage.message && <button
             onClick={handleMessageSent}
-            className='absolute top-1/2 right-4 transform -translate-y-1/2 bg-[#ff5722] text-white py-2 px-4 rounded-full transition duration-300 md:font-bold'>
+            className='absolute top-1/2 right-4 transform -translate-y-1/2 hover:text-white text-sky-500 font-semibold py-2 px-4 rounded-full transition duration-300'>
             Send
-          </button>
+          </button>}
         </div>
       </div>
-      <p className='text-center mt-1 md:-mb-6 text-gray-200 text-xs md:text-base'>Messages are deleted as soon as you leave this message page.</p>
     </div>
 
   );

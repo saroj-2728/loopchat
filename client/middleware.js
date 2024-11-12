@@ -3,36 +3,23 @@ import { NextResponse } from 'next/server';
 export function middleware(request) {
   const { pathname } = request.nextUrl;
   const userCookie = request.cookies.get('user');
-  const isLoggedIn = userCookie !== undefined;
+  const isLoggedIn = Boolean(userCookie);
 
-  let username;
+  // Public paths that everyone can access
+  const publicPaths = ['/', '/about', '/contact', '/login', '/register'];
+  if (publicPaths.includes(pathname)) {
+    return NextResponse.next();
+  }
+
+  // If logged in, allow access to any page
   if (isLoggedIn) {
-    const user = JSON.parse(userCookie.value);
-    username = user.username;
-  }
-
-  // Allow access to login, register, about, contact and home page for everyone
-  if (
-    pathname === '/login' ||
-    pathname === '/register' ||
-    pathname === '/' ||
-    pathname === '/about' ||
-    pathname === '/contact' ||
-    (isLoggedIn && (pathname === '/home'))
-  ) {
     return NextResponse.next();
   }
 
-  const userPathname = pathname.split('/')[1];
-  if (isLoggedIn && username === userPathname) {
-    return NextResponse.next();
+  // If not logged in, redirect to /login with query string for feedback
+  if (!isLoggedIn) {
+    return NextResponse.redirect(new URL('/login?redirected=true', request.url));
   }
-
-  if (isLoggedIn && userPathname) {
-    return NextResponse.redirect(new URL('/home', request.url));
-  }
-
-  return NextResponse.redirect(new URL('/login', request.url));
 }
 
 export const config = {

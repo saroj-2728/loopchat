@@ -16,7 +16,7 @@ export const SocketProvider = ({ children }) => {
     useEffect(() => {
         if (!user?.username) return;
 
-        const socket = io("https://next-js-chat-app.onrender.com");
+        const socket = io(process.env.NEXT_PUBLIC_SERVER_URL);
         socketRef.current = socket;
         socketRef.current.emit("register", user.username)
 

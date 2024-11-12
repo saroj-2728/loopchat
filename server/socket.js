@@ -1,11 +1,14 @@
 import { Server } from 'socket.io';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.local' });
 
 let io;
 
 export const initSocket = (server) => {
     io = new Server(server, {
         cors: {
-            origin: 'https://next-js-chat-app-5lgs.vercel.app',
+            origin: process.env.CLIENT_URL,
             methods: ['GET', 'POST'],
             allowedHeaders: ['Content-Type']
           }

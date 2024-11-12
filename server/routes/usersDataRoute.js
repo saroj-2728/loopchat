@@ -1,8 +1,8 @@
 import express from "express";
-import { handleUsersList } from "../controllers/usersDataController.js";
+import { handleALlUsersList } from "../controllers/allUsersDataController.js";
 
 const router = express.Router();
 
-router.post('/users', handleUsersList);
+router.post('/users', handleALlUsersList);
 
 export default router;

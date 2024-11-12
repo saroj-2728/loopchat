@@ -12,9 +12,29 @@ const userSchema = new Schema({
         required: true,
         unique: true,
     },
+    email: {
+        type: String,
+        required: false,
+        unique: false,
+    },
+    bio: {
+        type: String,
+        required: false,
+        unique: false,
+    },
     password: {
         type: String,
         required: true,
+    },
+    profileImage: {
+        url: {
+            type: String,
+            required: false,
+        },
+        public_id: {
+            type: String,
+            required: false,
+        },
     },
 });
 

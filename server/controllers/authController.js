@@ -19,11 +19,14 @@ export const handleLogin = async (req, res) => {
             return res.status(200).json({
                 success: true,
                 userData: {
+                    username: user.username,
                     name: user.name,
-                    username: user.username
+                    email: user?.email,
+                    bio: user?.bio,
+                    profileImage: user.profileImage,
                 },
-                message: "Logged In Succssfully!"
-            })
+                message: "Logged In Successfully!"
+            });
         }
         return res.status(401).json({
             success: false,
@@ -62,8 +65,15 @@ export const handleRegister = async (req, res) => {
         newUserSignUpSocket()
         return res.status(200).json({
             success: true,
-            message: "Registered Succssfully!"
-        })
+            userData: {
+                name: newUser.name,
+                username: newUser.username,
+                email: newUser.email || null,
+                bio: newUser.bio || null,
+                profileImage: newUser.profileImage || null,
+            },
+            message: "Profile updated successfully!"
+        });
     }
     catch (err) {
         console.error("Error during registration:", err);

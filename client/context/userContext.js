@@ -18,8 +18,8 @@ export const UserProvider = ({ children }) => {
         return cookie ? decodeURIComponent(cookie.split('=')[1]) : null;
     };
 
-    const login = (username, name) => {
-        const loggedInUser = { username, name };
+    const login = (userObj) => {
+        const loggedInUser = userObj;
         setUser(loggedInUser);
         setCookie('user', JSON.stringify(loggedInUser), 7);
         localStorage.setItem('isLoggedIn', "true");
