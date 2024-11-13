@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import { UserProvider } from '@/context/userContext';
 import AllUsersProvider from "@/context/allUsersContext";
 import { SocketProvider } from "@/context/socketContext";
+import { PopupProvider } from "@/context/PopupContext";
+import Popup from "@/components/Popup";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,14 +32,16 @@ export default function RootLayout({ children }) {
         <UserProvider>
           <SocketProvider>
             <AllUsersProvider>
-              <div className="max-w-[2160px] md:flex flex-row">
-                <Navbar />
-                {children}
-              </div>
+              <PopupProvider>
+                <Popup />
+                <div className="md:flex flex-row">
+                  <Navbar />
+                  {children}
+                </div>
+              </PopupProvider>
             </AllUsersProvider>
           </SocketProvider>
         </UserProvider>
-
       </body>
     </html>
   );

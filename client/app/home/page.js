@@ -32,7 +32,7 @@ const Home = () => {
 
                         <Link
                             href={'/messages'}
-                            className="w-full bg-sky-500 hover:bg-sky-600 text-white text-base md:text-xl transition-colors duration-300 font-semibold py-3.5 px-4 rounded-lg focus:outline-none focus:shadow-outline cursor-pointer"
+                            className="w-full bg-button-primary hover:bg-button-primary/80 text-white text-base md:text-xl transition-colors duration-300 font-semibold py-3.5 px-4 rounded-lg focus:outline-none focus:shadow-outline cursor-pointer"
                         >
                             Go to Messages
                         </Link>

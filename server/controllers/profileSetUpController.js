@@ -48,7 +48,7 @@ export const handleProfileSetUp = async (req, res) => {
             } catch (error) {
                 return res.status(500).json({
                     success: false,
-                    message: 'Error uploading profile image to Cloudinary',
+                    message: 'Error uploading profile image!',
                 });
             }
         }

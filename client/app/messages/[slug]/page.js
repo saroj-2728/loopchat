@@ -125,7 +125,7 @@ const MessagePage = ({ params }) => {
               key={index}
               className={`flex flex-col ${msgObj.mode === "sent" ? "items-end" : "items-start"} my-5`}
             >
-              <span className={`rounded-xl md:py-2 py-1 px-4 md:px-5 text-lg ${msgObj.mode === "sent" ? "bg-sky-500" : "bg-gray-600/50"} text-white`}>
+              <span className={`rounded-xl md:py-2 py-1 px-4 md:px-5 text-lg ${msgObj.mode === "sent" ? "bg-sky-500" : "bg-gray-600/50"} text-white max-w-[50%]`}>
                 {msgObj.message}
               </span>
             </div>

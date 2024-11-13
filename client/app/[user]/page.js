@@ -36,7 +36,7 @@ const UserProfile = ({ posts }) => {
                         <h2 className="text-xl">
                             {user?.username}
                         </h2>
-                        <Link href={`${pathname}/edit-profile`} className="text-sm  font-medium bg-gray-700 px-3 md:px-4 py-1 md:py-2 rounded-md hover:bg-gray-800 transition duration-150">
+                        <Link href={`${pathname}/edit-profile`} className="text-sm  font-medium bg-button-secondary hover:bg-button-secondary/90 px-3 md:px-4 py-1 md:py-2 rounded-md transition duration-150">
                             Edit Profile
                         </Link>
                     </div>

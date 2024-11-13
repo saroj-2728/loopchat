@@ -27,20 +27,27 @@ const About = () => {
           </div>
 
           <section className="mb-6 md:mb-10">
-            <h2 className="text-2xl md:text-3xl font-semibold text-center text-white mb-6 md:mb-8">App Features</h2>
+            <h2 className="text-2xl md:text-3xl font-semibold text-center text-white mb-6 md:mb-8">
+              App Features
+            </h2>
 
             <div className="flex flex-wrap justify-center md:space-x-6">
+
               <div className="bg-gray-950 shadow-lg rounded-lg p-6 md:p-8 max-w-xs mb-6 md:mb-8 transform hover:scale-105 transition duration-300 hover:bg-gray-900 hover:shadow-small cursor-pointer group">
-                <h3 className="text-lg md:text-xl font-semibold text-sky-500 mb-4 transition duration-300 group-hover:text-sky-600">Real-time Messaging</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-white/80 group-hover:text-white mb-4 transition duration-300">
+                  Real-time Messaging
+                </h3>
                 <p className="text-sm md:text-base text-gray-400 transition duration-300 group-hover:text-gray-300">
                   Real-time communication system made on Socket IO.
                 </p>
               </div>
 
               <div className="bg-gray-950 shadow-lg rounded-lg p-6 md:p-8 max-w-xs mb-6 md:mb-8 transform transition duration-300 hover:scale-105 hover:bg-gray-900  hover:shadow-small cursor-pointer group">
-                <h3 className="text-lg md:text-xl font-semibold text-sky-500 mb-4 transition duration-300 group-hover:text-sky-600">User Access Control</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-white/80 group-hover:text-white mb-4 transition duration-300">
+                  User Access Control
+                </h3>
                 <p className="text-sm md:text-base text-gray-400 transition duration-300 group-hover:text-gray-300">
-                Users can sign in to gain access to the messaging platform.
+                  Users can sign in to gain access to the messaging platform.
                 </p>
               </div>
             </div>

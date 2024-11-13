@@ -25,7 +25,7 @@ export default function Home() {
         {isLoading ? (<Loader size={'h-16 w-16'} text={"Please Wait ..."}/>) : (
           <div className='max-w-[1440px] md:mt-24 md:mb-24'>
 
-            <section className="flex flex-col items-center text-center transition-all duration-500 ease-in-out text-white px-6 py-12 md:px-16 md:py-20 rounded-lg shadow-custom">
+            <section className="flex flex-col items-center text-center transition-all duration-500 ease-in-out text-white px-6 py-6 md:px-16 md:py-10 rounded-lg shadow-custom">
 
               <h1 className="text-white text-3xl md:text-5xl font-bold mb-4">
                 Connect Instantly, Chat Effortlessly
@@ -34,19 +34,19 @@ export default function Home() {
                 Real-time messaging, private conversations, and seamless interaction.
               </p>
 
-              <button onClick={() => { router.push('/login') }} className="bg-sky-500 hover:bg-sky-700 text-white font-semibold py-3 px-7 rounded-lg shadow-lg transition duration-300">
+              <button onClick={() => { router.push('/login') }} className="bg-button-primary hover:bg-button-primary/80 text-white font-semibold py-3 px-12 rounded-lg shadow-lg transition duration-300">
                 Get Started
               </button>
             </section>
 
-            <section className="text-center mt-12 md:mt-20">
+            <section className="flex flex-col items-center text-center transition-all duration-500 ease-in-out text-white px-6 py-6 md:px-16 md:py-10 rounded-lg shadow-custom">
               <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4 md:mb-6">
                 Start Your Journey with LoopChat
               </h2>
               <p className="text-gray-200 mb-6 md:mb-8 max-w-xl mx-auto text-sm md:text-base">
                 Sign up and give it a try.
               </p>
-              <button onClick={() => { router.push('/register') }} className="bg-white hover:bg-gray-300 text-sky-500 font-semibold py-3 px-7 rounded-lg shadow-lg transition duration-300">
+              <button onClick={() => { router.push('/register') }} className="bg-white hover:bg-white/80 text-black font-semibold py-3 px-12 rounded-lg shadow-lg transition duration-300">
                 Sign Up
               </button>
             </section>

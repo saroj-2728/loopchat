@@ -99,41 +99,47 @@ const Navbar = () => {
                                             About
                                         </div>
                                     </Link>
-                                    <Link
-                                        href="/messages"
-                                        className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
-                                    >
-                                        <NavIcons.MessageIcon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
-                                        <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
-                                            Messages
-                                        </div>
-                                    </Link>
-                                    <Link
-                                        href="/contact"
-                                        className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
-                                    >
-                                        <NavIcons.NotificationIcon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
-                                        <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
-                                            Notifications
-                                        </div>
-                                    </Link>
-                                    <Link
-                                        href={"/" + user?.username}
-                                        className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
-                                    >
-                                        <div className='flex justify-center md:justify-start h-[28px] w-[28px]'>
-                                            <Image
-                                                src={user?.profileImage?.url || defaultProfileSrc}
-                                                width={28}
-                                                height={28}
-                                                alt='User Profile'
-                                                className='rounded-full object-cover object-center'
-                                            />
-                                        </div>
-                                        <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
-                                            Profile
-                                        </div>
-                                    </Link>
+                                    {user &&
+                                        <>
+                                            <Link
+                                                href="/messages"
+                                                className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                                            >
+                                                <NavIcons.MessageIcon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
+                                                <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
+                                                    Messages
+                                                </div>
+                                            </Link>
+
+                                            <Link
+                                                href="/contact"
+                                                className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                                            >
+                                                <NavIcons.NotificationIcon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
+                                                <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
+                                                    Notifications
+                                                </div>
+                                            </Link>
+
+                                            <Link
+                                                href={"/" + user?.username}
+                                                className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                                            >
+                                                <div className='flex justify-center md:justify-start h-[28px] w-[28px]'>
+                                                    <Image
+                                                        src={user?.profileImage?.url || defaultProfileSrc}
+                                                        width={28}
+                                                        height={28}
+                                                        alt='User Profile'
+                                                        className='rounded-full object-cover object-center'
+                                                    />
+                                                </div>
+                                                <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
+                                                    Profile
+                                                </div>
+                                            </Link>
+                                        </>
+                                    }
                                 </div>
                             </div>
 
@@ -142,7 +148,6 @@ const Navbar = () => {
                                 {status === "loading" ? (
                                     <Loader size={'w-8 h-8'} text={''} />
                                 ) : status === "loggedIn" ? (
-                                    // If user is logged in, show user info
                                     <div className="flex flex-row gap-4 items-center md:w-full">
                                         <span
                                             className='md:hidden'
@@ -174,10 +179,9 @@ const Navbar = () => {
                                         </button>
                                     </div>
                                 ) : (
-                                    // If no user is logged in, show login button
                                     <Link
                                         href='/login'
-                                        className="bg-white text-blue-600 font-semibold py-2 px-6 rounded-lg shadow-lg hover:bg-gray-200 md:w-1/2 md:py-3 md:ms-5 md:text-base lg:text-xl"
+                                        className="bg-white hover:bg-white/80 text-black font-semibold rounded-lg ms-4 px-10 py-3 w-full transition duration-300"
                                     >
                                         Login
                                     </Link>
@@ -212,7 +216,7 @@ const Navbar = () => {
 
                 </nav>
             </div>
-           <MobileNav />
+            <MobileNav />
         </>
     );
 }

@@ -16,26 +16,26 @@ const MobileNav = () => {
 
     return (
         !isMessagesPage &&
-            <div className="block md:hidden fixed w-full bottom-0 z-50">
-                <div id="mobile-menu" className="flex flex-row border-t border-t-white/20">
-                    <Link
-                        href={user?.username ? `/home` : `/`}
-                        className={`flex flex-row items-center justify-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
-                    >
-                        <NavIcons.HomeIcon className={`h-7 w-7`} />
-                    </Link>
-                    <Link
-                        href="/about"
-                        className={`flex flex-row items-center justify-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
-                    >
-                        <NavIcons.AboutIcon className={`h-7 w-7`} />
-                    </Link>
-                    <Link
-                        href="/messages"
-                        className={`flex flex-row items-center justify-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
-                    >
-                        <NavIcons.MessageIcon className={`h-7 w-7`} />
-                    </Link>
+        <div className="block md:hidden fixed w-full bottom-0 z-50">
+            <div id="mobile-menu" className="flex flex-row border-t border-t-white/20">
+                <Link
+                    href={user?.username ? `/home` : `/`}
+                    className={`flex flex-row items-center justify-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                >
+                    <NavIcons.HomeIcon className={`h-7 w-7`} />
+                </Link>
+                <Link
+                    href="/about"
+                    className={`flex flex-row items-center justify-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                >
+                    <NavIcons.AboutIcon className={`h-7 w-7`} />
+                </Link>
+                {user && <><Link
+                    href="/messages"
+                    className={`flex flex-row items-center justify-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                >
+                    <NavIcons.MessageIcon className={`h-7 w-7`} />
+                </Link>
                     <Link
                         href="/contact"
                         className={`flex flex-row items-center justify-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
@@ -56,8 +56,10 @@ const MobileNav = () => {
                             />
                         </div>
                     </Link>
-                </div>
+                </>
+                }
             </div>
+        </div>
     )
 }
 
