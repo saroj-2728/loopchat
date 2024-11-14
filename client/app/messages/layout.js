@@ -21,12 +21,12 @@ export default function RootLayout({ children }) {
 
     return (
         <>
-            <div className={`max-w-[2160px] mx-auto md:mx-0 w-full relative flex flex-col md:shadow-custom h-screen md:rounded-xl`}>
+            <div className={`mx-auto md:mx-0 w-full relative flex flex-col md:shadow-custom h-screen md:rounded-xl`}>
                 <div className="flex flex-row h-full w-full">
 
-                    <div className={`lg:flex flex-col items-center md:w-1/3 w-full md:border-r md:border-r-white/30  h-full ${messagePageRegex.test(pathname) ? "hidden" : ""}`}>
+                    <div className={`lg:flex flex-col items-center md:w-[36%] w-full md:border-r md:border-r-white/30  h-full ${messagePageRegex.test(pathname) ? "hidden" : ""} max-w-[460px]`}>
 
-                        <div className="shadow-small rounded-lg p-4 md:px-0 w-full max-w-md text-center h-full flex flex-col bg-black/30 backdrop-blur-md ">
+                        <div className="shadow-small rounded-lg p-4 md:px-0 w-full mx-auto text-center h-full flex flex-col">
 
                             <div className="flex items-center">
                                 <Link
@@ -40,7 +40,7 @@ export default function RootLayout({ children }) {
                                 </h1>
                             </div>
 
-                            <div className="users w-full mt-2 md:mt-4  overflow-y-auto flex-grow">
+                            <div className="users w-full mt-2 md:mt-4  overflow-y-auto flex flex-col flex-grow">
                                 {allUsers.length > 0 ? (
                                     allUsers.map((user) => (
                                         <Link

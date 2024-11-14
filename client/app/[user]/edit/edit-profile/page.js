@@ -20,7 +20,7 @@ const ProfileEdit = () => {
     const [fileSizeError, setFileSizeError] = useState("")
     const [isLoading, setLoading] = useState(false)
     const [imagePreview, setImagePreview] = useState(user?.profileImage?.url || DefaultProfile());
-    
+
     const fileInputRef = useRef(null);
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -78,21 +78,21 @@ const ProfileEdit = () => {
             {isLoading ?
                 <Loader size={'h-16 w-16'} text={"Please Wait ..."} />
                 :
-                <div className="max-w-4xl w-full p-1 md:p-4 rounded-lg shadow-lg">
+                <div className="max-w-[850px] w-full p-1 md:p-4 rounded-lg shadow-lg">
                     <h1 className="text-xl md:text-3xl text-center font-semibold my-6">
                         Edit Profile
                     </h1>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="mb-14 rounded-lg p-2 md:p-8 space-y-6">
 
-                        <div className="w-auto flex justify-between items-center bg-accent rounded-3xl md:px-6 px-3">
+                        <div className="w-auto flex justify-between items-center bg-accent rounded-3xl md:px-6 px-3 md:py-1">
                             <div className="flex flex-row items-center gap-3 md:gap-5">
                                 {imagePreview && (
-                                    <div className="my-4 w-14 md:w-20 h-14 md:h-20 flex justify-center mx-auto">
+                                    <div className="my-4 w-14 md:w-[70px] h-14 md:h-[70px] flex justify-center mx-auto">
                                         <Image
                                             src={imagePreview}
-                                            width={80}
-                                            height={80}
+                                            width={70}
+                                            height={70}
                                             alt="Profile Preview"
                                             className="rounded-full object-cover object-center"
                                         />
@@ -207,6 +207,25 @@ const ProfileEdit = () => {
                         </div>
 
                     </form>
+
+                    <div className="md:hidden w-full text-center mb-20">
+                        <p>Looking for something else ?</p>
+                        <div className="w-full mx-auto flex flex-row py-2 justify-center gap-5">
+                            <Link
+                                href={`/${user?.username}/edit/change-password`}
+                                className="text-sky-500"
+                                >
+                                Change Password
+                            </Link>
+                            <Link
+                                href={`/${user?.username}/edit/delete-profile`}
+                                className="text-sky-500"
+                                >
+                                Delete Profile
+                            </Link>
+                        </div>
+                    </div>
+
                 </div>
             }
         </div>

@@ -4,6 +4,7 @@ import authRoutes from './routes/authRoutes.js';
 import usersDataRoute from './routes/usersDataRoute.js';
 import profileSetUpRoute from './routes/profileSetUpRoute.js'
 import profileUpdateRoute from './routes/profileUpdateRoute.js'
+import messageRoute from './routes/messageRoute.js'
 import dotenv from 'dotenv';
 import './cloudinary/cloudinaryConfig.js';
 
@@ -21,6 +22,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', usersDataRoute)
 app.use('/api', profileSetUpRoute)
 app.use('/api', profileUpdateRoute)
+app.use('/api', messageRoute)
 
 app.get('/', (req, res) => {
     res.send('Server Running!');

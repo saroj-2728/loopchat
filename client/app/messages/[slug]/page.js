@@ -15,12 +15,14 @@ const MessagePage = ({ params }) => {
   const { user: userMe } = useContext(UserContext);
   const { allUsers } = useContext(AllUsersContext)
   const router = useRouter()
+
   const socketRef = useSocket()
   const endOfMessagesRef = useRef(null);
+
   const [targetUser, settargetUser] = useState({});
-  const [sender, setSender] = useState({})
-  const [inputMessage, setInputMessage] = useState({ mode: "", message: "" })
+  const [inputMessage, setInputMessage] = useState("")
   const [messages, setMessages] = useState([])
+
   const defaultProfileSrc = DefaultProfile()
 
   const isMobileDevice = () => {
@@ -34,10 +36,32 @@ const MessagePage = ({ params }) => {
       if (theUser)
         settargetUser(theUser)
       else
-        userMe ? router.push(`/${userMe?.username}/messages`) : "";
+        router.push(`/messages`)
     };
     fetchUsersName();
-  }, [allUsers, params.slug, router, userMe]);
+  }, [allUsers, params.slug, router]);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/messages/${userMe.username}/${targetUser.username}`);
+        const result = await response.json();
+        
+        if (response.ok) {
+          setMessages(result);
+        } else {
+          console.error('Failed to fetch messages:', result.error);
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      }
+    };
+
+    if (targetUser.username && userMe.username) {
+      fetchMessages();
+    }
+
+  }, [targetUser, userMe]);
 
   useEffect(() => {
     document.title = `Message ${targetUser.name}`
@@ -48,12 +72,11 @@ const MessagePage = ({ params }) => {
 
     // Listen for incoming messages 
     socket?.on('privateMessage', (data) => {
-      if (data.sender.username === targetUser.username && userMe.username === data.receiverId) {
-        setSender(data.sender)
-        setMessages((prevMessages) => [...prevMessages, {
-          mode: "received",
-          message: data.inputMessage
-        }]);
+      if (data.senderId === targetUser.username && userMe.username === data.receiverId) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          data,
+        ]);
       }
     });
 
@@ -67,30 +90,30 @@ const MessagePage = ({ params }) => {
     setTimeout(() => {
       endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
     }, delay);
-
   }, [messages]);
 
   const ref = useRef(null)
   const handleMessageSent = (e) => {
-    if (inputMessage.message.trim() === "") {
-      setInputMessage({ mode: "", message: "" })
+    if (inputMessage.trim() === "") {
+      setInputMessage("")
       return;
     }
-    setMessages((prevMessages) => [...prevMessages, {
-      mode: "sent",
-      message: inputMessage.message
-    }]);
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        senderId: userMe.username,
+        receiverId: targetUser.username,
+        content: inputMessage,
+      },
+    ]);
 
     socketRef.current.emit('privateMessage', {
-      inputMessage: inputMessage.message,
-      sender: {
-        username: userMe.username,
-        name: userMe.name
-      },
-      receiverId: targetUser.username
+      senderId: userMe.username,
+      receiverId: targetUser.username,
+      content: inputMessage,
+      timestamp: new Date().toISOString(),
     });
-    setInputMessage({ mode: "", message: "" });
-
+    setInputMessage("");
   }
 
   return (
@@ -119,14 +142,25 @@ const MessagePage = ({ params }) => {
       </div>
 
       <div ref={ref} className="messageSection w-full overflow-auto flex-grow rounded-lg px-4 md:px-6">
-        {messages.length > 0 ? (
+        {messages?.length > 0 ? (
           messages.map((msgObj, index) => (
             <div
               key={index}
-              className={`flex flex-col ${msgObj.mode === "sent" ? "items-end" : "items-start"} my-5`}
+              className={`flex flex-row w-full ${msgObj.senderId === userMe?.username ? "justify-end" : "justify-start"} items-center gap-2 md:gap-3 my-5`}
             >
-              <span className={`rounded-xl md:py-2 py-1 px-4 md:px-5 text-lg ${msgObj.mode === "sent" ? "bg-sky-500" : "bg-gray-600/50"} text-white max-w-[50%]`}>
-                {msgObj.message}
+              {msgObj.senderId !== userMe?.username &&
+                <div className='flex justify-center w-[30px] h-[30px] md:h-[38px] md:w-[38px]'>
+                  <Image
+                    src={targetUser?.profileImage?.url}
+                    height={40}
+                    width={40}
+                    alt="User's Profile"
+                    className='rounded-full'
+                  />
+                </div>
+              }
+              <span className={`rounded-xl md:py-2 py-1 px-4 md:px-5 text-lg ${msgObj.senderId === userMe?.username ? "bg-sky-500 rounded-br" : "bg-gray-600/50 rounded-bl"} text-white max-w-[50%]`}>
+                {msgObj.content}
               </span>
             </div>
           ))
@@ -144,13 +178,13 @@ const MessagePage = ({ params }) => {
             id='message'
             name='message'
             type="text"
-            value={inputMessage.message}
+            value={inputMessage}
             placeholder='Message...'
             onKeyDown={(e) => { if (e.key === "Enter") handleMessageSent(); }}
-            onChange={(e) => setInputMessage({ mode: "", message: e.target.value })}
+            onChange={(e) => setInputMessage(e.target.value)}
             className='py-3 md:py-[14px] pl-6 pr-24 w-full text-sm md:text-lg box-border rounded-full border border-gray-200/30 text-white bg-transparent placeholder-white/50'
           />
-          {inputMessage.message && <button
+          {inputMessage && <button
             onClick={handleMessageSent}
             className='absolute top-1/2 right-4 transform -translate-y-1/2 hover:text-white text-sky-500 font-semibold py-2 px-4 rounded-full transition duration-300'>
             Send

@@ -10,7 +10,6 @@ const Messages = () => {
 
     return (
         <>
-
             <div className='md:flex hidden justify-center items-center h-full w-full text-2xl'>
             Send private messages to any friend.
             </div>

@@ -18,12 +18,18 @@ const Navbar = () => {
     const isMessagesPage = pathname.includes('/messages');
     const router = useRouter();
     const { user, logout } = useContext(UserContext);
+
     const [status, setStatus] = useState("loading");
     const [isPopupVisible, setPopupVisible] = useState(false);
+    const [notificationsVisible, setNotificationsVisible] = useState(false)
+
     const popupRef = useRef(null);
+    const navRef = useRef(null)
     const defaultProfileSrc = DefaultProfile()
+    let shortNav = notificationsVisible || isMessagesPage;
 
     const togglePopup = () => setPopupVisible(!isPopupVisible);
+    const toggleNotifications = () => setNotificationsVisible(!notificationsVisible)
 
     useEffect(() => {
         if (user === undefined) {
@@ -57,18 +63,21 @@ const Navbar = () => {
 
     return (
         <>
-            <div className={`z-10 sticky top-0 h-screen hidden md:flex flex-col justify-center ${isMessagesPage ? 'w-auto' : 'md:w-1/5 lg:w-1/4'} md:border-r md:border-r-white/20`}>
-                <nav className="h-full md:w-full">
-                    <div className="mx-auto md:mx-0 px-2 lg:px-3 h-full md:w-full">
+            <div className={`z-10 sticky top-0 h-screen hidden md:flex flex-row justify-start ${isMessagesPage ? '' : 'md:w-1/5 lg:w-1/4'} ${!shortNav ? 'border-r' : ""}  border-r-white/20 max-w-md`}>
+
+                <nav ref={navRef} className={`h-full ${shortNav ? '' : "w-full"} relative`}>
+
+                    <div className={`mx-auto md:mx-0 px-2 lg:px-3 h-full md:w-full ${shortNav ? 'border-r' : ""}  border-r-white/20`}>
 
                         <div className="relative flex flex-row md:flex-col h-14 md:h-full md:py-20 items-center md:items-start justify-between md:w-full">
 
                             {/* Logo */}
                             <Link
                                 href={user?.username ? '/home' : '/'}
+                                onClick={() => { notificationsVisible && toggleNotifications() }}
                                 className="hidden md:block text-base lg:text-xl cursor-pointer px-4 lg:px-5"
                             >
-                                {isMessagesPage ?
+                                {shortNav ?
                                     <Image
                                         src={Logo}
                                         width={30}
@@ -83,47 +92,51 @@ const Navbar = () => {
                                 <div className="flex flex-row md:flex-col md:items-center md:justify-center md:gap-3 md:py-4 md:w-full">
                                     <Link
                                         href={user?.username ? `/home` : `/`}
-                                        className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                                        onClick={() => { notificationsVisible && toggleNotifications() }}
+                                        className={`flex flex-row ${shortNav ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
                                     >
                                         <NavIcons.HomeIcon className={`h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7`} />
-                                        <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
+                                        <div className={`${shortNav ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
                                             Home
                                         </div>
                                     </Link>
                                     <Link
                                         href="/about"
-                                        className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                                        onClick={() => { notificationsVisible && toggleNotifications() }}
+                                        className={`flex flex-row ${shortNav ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
                                     >
                                         <NavIcons.AboutIcon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
-                                        <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
+                                        <div className={`${shortNav ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
                                             About
                                         </div>
                                     </Link>
-                                    {user &&
+                                    {user?.username &&
                                         <>
                                             <Link
                                                 href="/messages"
-                                                className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                                                onClick={() => { notificationsVisible && toggleNotifications() }}
+                                                className={`flex flex-row ${shortNav ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
                                             >
                                                 <NavIcons.MessageIcon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
-                                                <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
+                                                <div className={`${shortNav ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
                                                     Messages
                                                 </div>
                                             </Link>
 
-                                            <Link
-                                                href="/contact"
-                                                className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                                            <div
+                                                onClick={toggleNotifications}
+                                                className={`flex flex-row ${shortNav ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full cursor-pointer`}
                                             >
                                                 <NavIcons.NotificationIcon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
-                                                <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
+                                                <div className={`${shortNav ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
                                                     Notifications
                                                 </div>
-                                            </Link>
+                                            </div>
 
                                             <Link
                                                 href={"/" + user?.username}
-                                                className={`flex flex-row ${isMessagesPage ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
+                                                onClick={() => { notificationsVisible && toggleNotifications() }}
+                                                className={`flex flex-row ${shortNav ? 'gap-0 justify-center ' : 'gap-2 justify-start'} items-center hover:bg-gray-700/35 transition-all duration-300 rounded-lg px-3 lg:px-4 py-4 w-full`}
                                             >
                                                 <div className='flex justify-center md:justify-start h-[28px] w-[28px]'>
                                                     <Image
@@ -134,7 +147,7 @@ const Navbar = () => {
                                                         className='rounded-full object-cover object-center'
                                                     />
                                                 </div>
-                                                <div className={`${isMessagesPage ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
+                                                <div className={`${shortNav ? 'hidden' : 'block'} text-lg md:text-base lg:text-xl font-medium text-gray-300 hover:text-white text-start`}>
                                                     Profile
                                                 </div>
                                             </Link>
@@ -166,7 +179,7 @@ const Navbar = () => {
                                                 stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                                             </svg>
-                                            <p className={`${isMessagesPage ? '' : 'md:block'} hidden px-3 py-2 font-medium text-gray-300 hover:text-white text-start text-lg md:text-base lg:text-xl`}>
+                                            <p className={`${shortNav ? '' : 'md:block'} hidden px-3 py-2 font-medium text-gray-300 hover:text-white text-start text-lg md:text-base lg:text-xl`}>
                                                 More
                                             </p>
                                             <Image
@@ -213,6 +226,51 @@ const Navbar = () => {
                             </div>
                         </div>
                     </div>
+
+                    {notificationsVisible &&
+                        <section
+                            className={`notifications hidden md:block absolute left-full top-0 w-[300%] lg:w-[500%] md:w-[400%]  max-w-md h-full transition-all duration-300 bg-black border-r border-r-white/20`}
+                        >
+                            <div className="shadow-small rounded-lg p-4 md:px-0 w-full max-w-md mx-auto text-center h-full flex flex-col bg-black/30 backdrop-blur-md ">
+
+                                <div className="flex items-center">
+                                    <h1 className="text-base md:w-full w-[85%] md:text-2xl font-bold text-center text-white">
+                                        Notifications
+                                    </h1>
+                                </div>
+
+                                <div className="users w-full mt-2 md:mt-4  overflow-y-auto flex flex-col flex-grow">
+                                    <p>Notifications are currently unavailable.</p>
+                                    {/* {notifications.length > 0 ? (
+                                    notifications.map((notification) => (
+                                        <Link
+                                            href={`/messages/${user.username}`}
+                                            key={user._id}
+                                            className={`w-full border-y border-y-white/5 py-2 md:py-3 cursor-pointer transition duration-300  text-white ${pathname.split('/')[2] === user.username ? "bg-gray-600/60" : "hover:bg-gray-700/40"} flex flex-row items-center gap-4 md:px-4 px-1`}
+                                        >
+                                            <div className="flex justify-center h-[56px] w-[56px]">
+                                                <Image
+                                                    src={user?.profileImage?.url || defaultProfileSrc}
+                                                    width={56}
+                                                    height={56}
+                                                    className="rounded-full"
+                                                    alt="User Profile"
+                                                />
+                                            </div>
+                                            <div className="text-base md:text-xl flex flex-row gap-3">
+                                                {`${user.name}`}
+                                            </div>
+                                        </Link>
+                                    ))
+                                )
+                                    :
+                                    (
+                                    <Loader size={'h-8 w-8 md:h-14 md:w-14'} text={""} />
+                                    )} */}
+                                </div>
+                            </div>
+                        </section>
+                    }
 
                 </nav>
             </div>
