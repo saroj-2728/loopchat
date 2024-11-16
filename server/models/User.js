@@ -24,7 +24,9 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: function () {
+            return !this.oauthProvider;
+        },
     },
     profileImage: {
         url: {
@@ -36,6 +38,10 @@ const userSchema = new Schema({
             required: false,
         },
     },
+    oauthProvider: {
+        type: String,
+        required: false,
+    }
 });
 
 export const User = mongoose.models.User || mongoose.model('User', userSchema);

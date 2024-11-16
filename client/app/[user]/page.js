@@ -1,16 +1,16 @@
 "use client"
 import Image from 'next/image';
 import Link from 'next/link';
-import { UserContext } from '@/context/userContext';
-import { useContext } from 'react';
+import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import DefaultProfile from '@/utilities/DefaultProfile';
 
-const UserProfile = ({ posts }) => {
+const UserProfile = () => {
 
     const defaultProfileSrc = DefaultProfile()
     const pathname = usePathname()
-    const { user } = useContext(UserContext)
+    const { data } = useSession()
+    const user = data?.user;
 
     return (
         <div className="w-full flex flex-col items-center justify-center md:justify-start text-white min-h-screen">

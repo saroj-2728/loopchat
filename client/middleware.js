@@ -1,26 +1,12 @@
-import { NextResponse } from 'next/server';
-
-export function middleware(request) {
-  const { pathname } = request.nextUrl;
-  const userCookie = request.cookies.get('user');
-  const isLoggedIn = Boolean(userCookie);
-
-  // Public paths that everyone can access
+import { auth } from "@/auth"
+ 
+export default auth((req) => {
   const publicPaths = ['/', '/about', '/contact', '/login', '/register'];
-  if (publicPaths.includes(pathname)) {
-    return NextResponse.next();
+  if (!req.auth && !publicPaths.includes(req.nextUrl.pathname)) {
+    const newUrl = new URL("/login?redirected=true", req.nextUrl.origin)
+    return Response.redirect(newUrl)
   }
-
-  // If logged in, allow access to any page
-  if (isLoggedIn) {
-    return NextResponse.next();
-  }
-
-  // If not logged in, redirect to /login with query string for feedback
-  if (!isLoggedIn) {
-    return NextResponse.redirect(new URL('/login?redirected=true', request.url));
-  }
-}
+})
 
 export const config = {
   matcher: [

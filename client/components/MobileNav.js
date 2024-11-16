@@ -1,6 +1,5 @@
 'use client'
-import { UserContext } from "@/context/userContext"
-import { useContext } from "react"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import Image from "next/image"
 import { NavIcons } from "@/utilities/Icons"
@@ -9,7 +8,8 @@ import DefaultProfile from '@/utilities/DefaultProfile';
 
 const MobileNav = () => {
 
-    const { user } = useContext(UserContext)
+    const { data } = useSession()
+    const user = data?.user;
     const pathname = usePathname()
     const isMessagesPage = pathname.includes('/messages');
     const defaultProfileSrc = DefaultProfile()

@@ -1,19 +1,33 @@
 "use client"
-import { UserContext } from '@/context/userContext';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useContext, useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import Loader from '@/components/Loader';
+import { usePopup } from '@/context/PopupContext';
 
 const Home = () => {
 
-    const { user, logout } = useContext(UserContext)
+    const { data } = useSession()
+    const user = data?.user;
+
     const router = useRouter()
+    const { showPopup } = usePopup()
+
     const [loading, setLoading] = useState(false)
 
-    const handleLogOut = () => {
+    const searchParams = useSearchParams()
+    const githubloginsuccess = searchParams.get('githubloginsuccess')
+
+    useEffect(() => {
+        if (githubloginsuccess) {
+            showPopup("Signed In with github !")
+        }
+    }, [githubloginsuccess])
+
+    const handleLogOut = async () => {
         setLoading(true)
-        logout();
+        await signOut();
         router.push('/')
     }
 

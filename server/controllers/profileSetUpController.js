@@ -65,7 +65,8 @@ export const handleProfileSetUp = async (req, res) => {
                 name: user.name,
                 email: user?.email,
                 bio: user?.bio,
-                profileImage: user.profileImage,
+                profileImage: user.profileImage || { url: null, public_id: null },
+                oauthProvider: user?.oauthProvider || null
             },
             message: "Profile updated successfully!"
         });

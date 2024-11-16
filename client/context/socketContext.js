@@ -1,7 +1,7 @@
 "use client"
 import { createContext, useContext, useRef, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { io } from 'socket.io-client';
-import { UserContext } from "./userContext";
 
 const SocketContext = createContext();
 
@@ -10,7 +10,9 @@ export const useSocket = () => {
 }
 
 export const SocketProvider = ({ children }) => {
-    const { user } = useContext(UserContext)
+    
+    const { data } = useSession()
+    const user = data?.user;
     const socketRef = useRef(null)
 
     useEffect(() => {

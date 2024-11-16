@@ -9,25 +9,22 @@ export const handleLogin = async (req, res) => {
         await connectToDatabase();
 
         let user = await User.findOne({ username })
+
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: "User with this username doesn't exist!"
             })
         }
+
         if (user.password === password) {
             return res.status(200).json({
                 success: true,
-                userData: {
-                    username: user.username,
-                    name: user.name,
-                    email: user?.email,
-                    bio: user?.bio,
-                    profileImage: user.profileImage,
-                },
-                message: "Logged In Successfully!"
+                userData: user,
+                message: "Log In Successful !"
             });
         }
+        
         return res.status(401).json({
             success: false,
             message: "Incorrect Password! Please Try Again.."
@@ -43,7 +40,7 @@ export const handleLogin = async (req, res) => {
 }
 
 export const handleRegister = async (req, res) => {
-    const { name, username, password } = req.body;
+    const { name, username, email, password, bio, profileImage, oauthProvider } = req.body;
 
     try {
         await connectToDatabase();
@@ -55,14 +52,20 @@ export const handleRegister = async (req, res) => {
                 message: "User with this username already exists!"
             })
         }
+
         const newUser = new User({
             name,
             username,
-            password
+            email: email || null,
+            password: password || null,
+            bio: bio || null,
+            profileImage: profileImage || { url: null, public_id: null },
+            oauthProvider: oauthProvider || null
         })
         await newUser.save()
 
         newUserSignUpSocket()
+
         return res.status(200).json({
             success: true,
             userData: {
@@ -71,8 +74,9 @@ export const handleRegister = async (req, res) => {
                 email: newUser.email || null,
                 bio: newUser.bio || null,
                 profileImage: newUser.profileImage || null,
+                oauthProvider: oauthProvider || null
             },
-            message: "Profile updated successfully!"
+            message: "Registration Successful !"
         });
     }
     catch (err) {
@@ -83,3 +87,32 @@ export const handleRegister = async (req, res) => {
         });
     }
 }
+
+
+export const handleCheckUser = async (req, res) => {
+    const username = req.headers.username; // GitHub username
+
+    try {
+        await connectToDatabase();
+
+        const user = await User.findOne({ username });
+
+        if (user) {
+            return res.status(200).json({
+                success: true,
+                message: "User exists",
+            });
+        } else {
+            return res.status(404).json({
+                success: false,
+                message: "User does not exist",
+            });
+        }
+    } catch (err) {
+        console.error("Error checking user:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error. Please try again.",
+        });
+    }
+};

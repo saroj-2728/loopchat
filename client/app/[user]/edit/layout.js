@@ -1,13 +1,14 @@
 'use client'
-import { UserContext } from "@/context/userContext"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useContext, useEffect } from "react"
+import { useEffect } from "react"
 
 export default function RootLayout({ children }) {
 
+    const { data } = useSession()
+    const user = data?.user;
     const pathname = usePathname()
-    const { user } = useContext(UserContext)
 
     useEffect(() => {
         document.title = "Edit Profile"

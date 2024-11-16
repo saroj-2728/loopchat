@@ -1,6 +1,6 @@
 "use client"
-import React, { useEffect, useState, useRef, useContext } from 'react'
-import { UserContext } from '@/context/userContext';
+import React, { useEffect, useState, useRef, useContext, use } from 'react'
+import { useSession } from 'next-auth/react';
 import { AllUsersContext } from '@/context/allUsersContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -12,9 +12,11 @@ import { GoArrowLeft } from "react-icons/go";
 
 const MessagePage = ({ params }) => {
 
-  const { user: userMe } = useContext(UserContext);
+  const { data } = useSession()
+  const userMe = data?.user;
   const { allUsers } = useContext(AllUsersContext)
   const router = useRouter()
+  const { slug } = use(params);
 
   const socketRef = useSocket()
   const endOfMessagesRef = useRef(null);
@@ -32,21 +34,22 @@ const MessagePage = ({ params }) => {
   useEffect(() => {
     if (allUsers.length === 0) return;
     const fetchUsersName = () => {
-      const theUser = allUsers.find((user) => user.username === params.slug)
+      const theUser = allUsers.find((user) => user.username === slug)
       if (theUser)
         settargetUser(theUser)
       else
         router.push(`/messages`)
     };
     fetchUsersName();
-  }, [allUsers, params.slug, router]);
+  }, [allUsers, slug, router]);
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/messages/${userMe.username}/${targetUser.username}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/messages/${userMe?.oauthProvider ? userMe?.oauthProvider.slice(0, 2) + "-" : ""}${userMe?.username}/${targetUser.username}`);
+
         const result = await response.json();
-        
+
         if (response.ok) {
           setMessages(result);
         } else {
@@ -57,7 +60,7 @@ const MessagePage = ({ params }) => {
       }
     };
 
-    if (targetUser.username && userMe.username) {
+    if (targetUser.username && userMe?.username) {
       fetchMessages();
     }
 
@@ -72,7 +75,7 @@ const MessagePage = ({ params }) => {
 
     // Listen for incoming messages 
     socket?.on('privateMessage', (data) => {
-      if (data.senderId === targetUser.username && userMe.username === data.receiverId) {
+      if (data.senderId === targetUser.username && userMe?.username === data.receiverId) {
         setMessages((prevMessages) => [
           ...prevMessages,
           data,
@@ -93,6 +96,7 @@ const MessagePage = ({ params }) => {
   }, [messages]);
 
   const ref = useRef(null)
+
   const handleMessageSent = (e) => {
     if (inputMessage.trim() === "") {
       setInputMessage("")
@@ -101,14 +105,14 @@ const MessagePage = ({ params }) => {
     setMessages((prevMessages) => [
       ...prevMessages,
       {
-        senderId: userMe.username,
+        senderId: userMe?.username,
         receiverId: targetUser.username,
         content: inputMessage,
       },
     ]);
 
     socketRef.current.emit('privateMessage', {
-      senderId: userMe.username,
+      senderId: userMe?.username,
       receiverId: targetUser.username,
       content: inputMessage,
       timestamp: new Date().toISOString(),
@@ -146,7 +150,7 @@ const MessagePage = ({ params }) => {
           messages.map((msgObj, index) => (
             <div
               key={index}
-              className={`flex flex-row w-full ${msgObj.senderId === userMe?.username ? "justify-end" : "justify-start"} items-center gap-2 md:gap-3 my-5`}
+              className={`flex flex-row w-full ${msgObj.senderId === userMe?.username ? "justify-end" : "justify-start"} items-end gap-2 md:gap-3 my-5`}
             >
               {msgObj.senderId !== userMe?.username &&
                 <div className='flex justify-center w-[30px] h-[30px] md:h-[38px] md:w-[38px]'>
@@ -159,7 +163,7 @@ const MessagePage = ({ params }) => {
                   />
                 </div>
               }
-              <span className={`rounded-xl md:py-2 py-1 px-4 md:px-5 text-lg ${msgObj.senderId === userMe?.username ? "bg-sky-500 rounded-br" : "bg-gray-600/50 rounded-bl"} text-white max-w-[50%]`}>
+              <span className={`rounded-xl md:py-2 py-1 px-4 md:px-5 text-lg ${msgObj.senderId === userMe?.username ? "bg-sky-500 rounded-br" : "bg-gray-600/50 rounded-bl"} text-white max-w-[70%] md:max-w-[50%]`}>
                 {msgObj.content}
               </span>
             </div>

@@ -1,7 +1,7 @@
 'use client'
-import { useContext, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { UserContext } from "@/context/userContext";
+import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
@@ -11,7 +11,8 @@ import DefaultProfile from "@/utilities/DefaultProfile";
 
 export default function ProfileSetup() {
 
-    const { user, setUser } = useContext(UserContext)
+    const { data } = useSession()
+    const user = data?.user;
     const router = useRouter()
     const { showPopup } = usePopup()
 
@@ -58,9 +59,21 @@ export default function ProfileSetup() {
 
             const result = await response.json();
             if (result.success) {
-                setUser(result.userData);
-                showPopup("Profile Updated Successfully !")
-                router.push('/home')
+                const signInResponse = await signIn('credentials', {
+                    redirect: false,
+                    ...result.userData,
+                    profileImage: JSON.stringify(result.userData.profileImage)
+                })
+                if (signInResponse?.error) {
+                    setLoading(false)
+                    showPopup("Profile Updation Failed !", "red")
+                    setErrorMessage("Profile Updation Failed: ", signInResponse.error)
+                    console.error(("Error Updating Profile: ", signInResponse.error));
+                }
+                else {
+                    showPopup("Profile Updated Successfully !")
+                    router.push(`/home`)
+                }
             } else {
                 setLoading(false)
                 setErrorMessage(result.message);
@@ -70,6 +83,15 @@ export default function ProfileSetup() {
             console.error("Error updating profile:", err);
         }
     };
+
+    useEffect(() => {
+        if (user?.oauthProvider) router.back()
+    }, [user])
+
+
+    if (user?.oauthProvider) return (
+        <div></div>
+    )
 
     return (
         <div className="min-h-screen w-full flex flex-col items-center justify-center text-white">
@@ -109,11 +131,12 @@ export default function ProfileSetup() {
                                     accept="image/*"
                                 />
                                 <button
+                                    disabled={user?.oauthProvider}
                                     type="button"
                                     onClick={() => {
                                         fileInputRef.current.click();
                                     }}
-                                    className="px-3 md:px-5 py-2 bg-button-primary hover:bg-button-primary/80 rounded-xl text-sm md:text-base font-semibold transition duration-300">
+                                    className="px-3 md:px-5 py-2 bg-button-primary hover:bg-button-primary/80 disabled:bg-button-primary/80 rounded-xl text-sm md:text-base font-semibold transition duration-300">
                                     Change Photo
                                 </button>
                             </div>
@@ -148,11 +171,17 @@ export default function ProfileSetup() {
                             </div>
                         }
 
+                        {fileSizeError &&
+                            <div className="text-red-500 text-center mt-2">
+                                {fileSizeError}
+                            </div>
+                        }
+
                         <div className="flex flex-col md:flex-row gap-4">
                             <button
                                 type="submit"
-                                disabled={isSubmitting}
-                                className="w-full  bg-button-primary hover:bg-button-primary/80 text-white font-semibold py-3 rounded-lg transition duration-300"
+                                disabled={isSubmitting || user?.oauthProvider}
+                                className="w-full  bg-button-primary hover:bg-button-primary/80 disabled:bg-button-primary/80 text-white font-semibold py-3 rounded-lg transition duration-300"
                             >
                                 Save Profile
                             </button>

@@ -5,7 +5,7 @@ import cloudinary from 'cloudinary';
 export const handleProfileUpdate = async (req, res) => {
 
     const { prevUser } = req.params;
-    const { name, username, email, bio, previousPublicId } = req.body;
+    const { name, email, bio, previousPublicId } = req.body;
     const profileImage = req.file;
 
     try {
@@ -18,18 +18,7 @@ export const handleProfileUpdate = async (req, res) => {
                 message: "User not found"
             });
 
-        if (username !== user.username) {
-            const usernameExists = await User.findOne({ username });
-            if (usernameExists) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Username is already taken",
-                });
-            }
-        }
-
         user.name = name;
-        user.username = username;
         user.email = email ? email : "";
         user.bio = bio ? bio : "";
 

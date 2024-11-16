@@ -1,9 +1,9 @@
 "use client";
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRef, useEffect, useState, useContext } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { UserContext } from '@/context/userContext';
 import Logo from '@/public/images/logo.png'
 import profileImage from '@/images/logo.png';
 import { NavIcons } from '@/utilities/Icons';
@@ -17,7 +17,8 @@ const Navbar = () => {
     const pathname = usePathname()
     const isMessagesPage = pathname.includes('/messages');
     const router = useRouter();
-    const { user, logout } = useContext(UserContext);
+    const { data } = useSession()
+    const user = data?.user;
 
     const [status, setStatus] = useState("loading");
     const [isPopupVisible, setPopupVisible] = useState(false);
@@ -28,11 +29,15 @@ const Navbar = () => {
     const defaultProfileSrc = DefaultProfile()
     let shortNav = notificationsVisible || isMessagesPage;
 
-    const togglePopup = () => setPopupVisible(!isPopupVisible);
+    const togglePopup = () => {
+        setTimeout(() => {
+            setPopupVisible(!isPopupVisible);
+        }, 100);
+    }
     const toggleNotifications = () => setNotificationsVisible(!notificationsVisible)
 
     useEffect(() => {
-        if (user === undefined) {
+        if (user === null) {
             setStatus("loading");
         } else if (user) {
             setStatus("loggedIn");
@@ -41,29 +46,15 @@ const Navbar = () => {
         }
     }, [user]);
 
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (isPopupVisible && popupRef.current && !popupRef.current.contains(event.target) && !event.target.closest('#user-popup-button')) {
-                setPopupVisible(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isPopupVisible]);
-
     const handleLogoutClick = () => {
-        logout();
+        signOut();
         togglePopup();
         router.push('/')
     }
 
     return (
         <>
-            <div className={`z-10 sticky top-0 h-screen hidden md:flex flex-row justify-start ${isMessagesPage ? '' : 'md:w-1/5 lg:w-1/4'} ${!shortNav ? 'border-r' : ""}  border-r-white/20 max-w-md`}>
+            <div className={`z-10 max-h-screen sticky top-0 h-screen hidden md:flex flex-row justify-start ${isMessagesPage ? '' : 'md:w-1/5 lg:w-1/4'} ${!shortNav ? 'border-r' : ""}  border-r-white/20 max-w-md`}>
 
                 <nav ref={navRef} className={`h-full ${shortNav ? '' : "w-full"} relative`}>
 
@@ -161,7 +152,8 @@ const Navbar = () => {
                                 {status === "loading" ? (
                                     <Loader size={'w-8 h-8'} text={''} />
                                 ) : status === "loggedIn" ? (
-                                    <div className="flex flex-row gap-4 items-center md:w-full">
+                                    <div
+                                        className="flex flex-row gap-4 items-center md:w-full">
                                         <span
                                             className='md:hidden'
                                         >
@@ -203,7 +195,9 @@ const Navbar = () => {
 
 
                                 {isPopupVisible && (
-                                    <div ref={popupRef} className="absolute right-0 md:left-3 md:bottom-12 z-20 mt-2 w-48 md:w-56 md:py-2 md:px-3 bg-[#1e1e1e] shadow-lg rounded-lg ring-1 ring-black ring-opacity-5">
+                                    <div
+                                        ref={popupRef}
+                                        className="absolute right-0 md:left-3 md:bottom-12 z-20 mt-2 w-48 md:w-56 md:py-2 md:px-3 bg-[#1e1e1e] shadow-lg rounded-lg ring-1 ring-black ring-opacity-5">
                                         <Link
                                             href={`/${user.username}`}
                                             onClick={togglePopup}
@@ -229,7 +223,7 @@ const Navbar = () => {
 
                     {notificationsVisible &&
                         <section
-                            className={`notifications hidden md:block absolute left-full top-0 w-[300%] lg:w-[500%] md:w-[400%]  max-w-md h-full transition-all duration-300 bg-black border-r border-r-white/20`}
+                            className={`notifications hidden md:block max-h-screen absolute left-full top-0 w-[300%] lg:w-[500%] md:w-[400%]  max-w-md h-full transition-all duration-300 bg-black border-r border-r-white/20`}
                         >
                             <div className="shadow-small rounded-lg p-4 md:px-0 w-full max-w-md mx-auto text-center h-full flex flex-col bg-black/30 backdrop-blur-md ">
 
