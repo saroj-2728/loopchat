@@ -1,20 +1,23 @@
 
 import NextAuth from "next-auth"
 import GitHub from "next-auth/providers/github"
+import Google from 'next-auth/providers/google'
 import Credentials from "next-auth/providers/credentials"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import { prisma } from "@/prisma"
+import { v4 as uuidv4 } from 'uuid';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+    adapter: PrismaAdapter(prisma),
     providers: [
-        GitHub({
-            async profile(profile) {
-                return { ...profile }
-            },
+        Google({
+            allowDangerousEmailAccountLinking: true
         }),
+        GitHub,
         Credentials({
             name: "Credentials",
             credentials: {
-                name: { label: "Name", type: "text" },
-                username: { label: "Username", type: "text" },
+                email: { label: "Username", type: "email" },
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
@@ -25,103 +28,43 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             value === "null" ? null : value,
                         ])
                     );
-                    const profileImage = JSON.parse(credentials.profileImage || "{}");
-                    
-                    return { ...sanitizedCredentials, profileImage };
+
+                    return { ...sanitizedCredentials };
                 }
                 return null;
             },
         }),
     ],
     callbacks: {
-        async signIn({ account, profile }) {
-            if (account.provider === "github") {
-                try {
-                    const checkUserResponse = await fetch(`${process.env.SERVER_URL}/api/auth/check-user`, {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            username: `gi-${profile.login}`,
-                        },
-                    });
-
-                    const userExists = await checkUserResponse.json();
-
-                    if (!userExists.success) {
-
-                        try {
-                            const registerResponse = await fetch(`${process.env.SERVER_URL}/api/auth/register`, {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                    name: profile.name || profile.login,
-                                    username: `gi-${profile.login}`,
-                                    email: profile.email,
-                                    bio: profile.bio || "GitHub User",
-                                    profileImage: {
-                                        url: profile.avatar_url,
-                                        public_id: null
-                                    },
-                                    oauthProvider: "github"
-                                }),
-                            });
-
-                            const registerResult = await registerResponse.json();
-
-                            if (!registerResult.success) {
-                                console.error("Error registering GitHub user:", registerResult.message);
-                                return false;
-                            }
-                        } catch (registerError) {
-                            console.error("Error during registration:", registerError);
-                            return false;
-                        }
-                    }
-                } catch (checkUserError) {
-                    console.error("Error checking user existence:", checkUserError);
-                    return false;
-                }
-
+        async signIn({ user, account, profile }) {
+            if (profile && account) {
+                user.provider = account.provider;
+                user.bio = profile?.bio || null;
+                user.username = (profile.login || "") + "_" + uuidv4();
             }
-
-            if (account.provider === "credentials") {
-
-            }
-
             return true;
         },
         jwt({ token, user, account }) {
-
-            if (user && account.provider === "github") {
-                token.user = {
-                    username: user.login,
-                    name: user.name || user.login,
-                    email: user.email,
-                    bio: user.bio,
-                    profileImage: { url: user.avatar_url },
-                    oauthProvider: account.provider
-                }
+            if (user && account.provider !== "credentials" ) {
+                const { password, ...userWithoutPassword } = user;
+                token.user = userWithoutPassword;
             }
-
-            if (user && account.provider === "credentials") {
-                token.user = {
-                    username: user.username,
-                    name: user.name,
-                    email: user.email,
-                    bio: user.bio,
-                    profileImage: user.profileImage,
-                    oauthProvider: user.oauthProvider
-                }
-            }
-
+            // if (user && account.provider === "credentials" ) {
+            //     console.log(user, token);
+            //     const { password, ...userWithoutPassword } = user;
+            //     token.user = userWithoutPassword;
+            // }
             return token
         },
-        session({ session, token }) {
+
+        async session({ session, token }) {
             session.user = token.user;
             
             return session;
         },
-    }
+    },
+    session: {
+        strategy: 'jwt',
+    },
 })
+

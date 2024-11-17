@@ -17,13 +17,13 @@ const Home = () => {
     const [loading, setLoading] = useState(false)
 
     const searchParams = useSearchParams()
-    const githubloginsuccess = searchParams.get('githubloginsuccess')
+    const loginsuccess = searchParams.get('githubloginsuccess')
 
     useEffect(() => {
-        if (githubloginsuccess) {
-            showPopup("Signed In with github !")
+        if (user && loginsuccess) {
+            showPopup(`Signed In with ${loginsuccess.split("loginsuccess")[0]} !`)
         }
-    }, [githubloginsuccess])
+    }, [loginsuccess, user])
 
     const handleLogOut = async () => {
         setLoading(true)

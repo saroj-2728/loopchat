@@ -101,7 +101,7 @@ const Navbar = () => {
                                             About
                                         </div>
                                     </Link>
-                                    {user?.username &&
+                                    {user &&
                                         <>
                                             <Link
                                                 href="/messages"
@@ -149,16 +149,9 @@ const Navbar = () => {
 
                             {/* User and Popup */}
                             <div className="relative md:w-full">
-                                {status === "loading" ? (
-                                    <Loader size={'w-8 h-8'} text={''} />
-                                ) : status === "loggedIn" ? (
+                                {user? (
                                     <div
                                         className="flex flex-row gap-4 items-center md:w-full">
-                                        <span
-                                            className='md:hidden'
-                                        >
-                                            {user?.name}
-                                        </span>
                                         <button
                                             onClick={togglePopup}
                                             id="user-popup-button"
@@ -199,7 +192,7 @@ const Navbar = () => {
                                         ref={popupRef}
                                         className="absolute right-0 md:left-3 md:bottom-12 z-20 mt-2 w-48 md:w-56 md:py-2 md:px-3 bg-[#1e1e1e] shadow-lg rounded-lg ring-1 ring-black ring-opacity-5">
                                         <Link
-                                            href={`/${user.username}`}
+                                            href={`/${user?.username}`}
                                             onClick={togglePopup}
                                             className="block px-4 py-2 text-sm md:text-base lg:text-xl text-gray-200">
                                             Your Profile

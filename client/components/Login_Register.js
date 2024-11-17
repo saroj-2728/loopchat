@@ -1,12 +1,15 @@
 "use client"
-import React, { useState, useEffect, useRef, Suspense } from 'react'
-import { useSession, signIn } from 'next-auth/react';
+import React, { useState, useRef, Suspense } from 'react'
+import { useSession, signIn, signOut } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { credentialsSignIn } from '@/actions/credentialsSignIn';
+import { redirect } from 'next/navigation';
 import Loader from './Loader';
 import { usePopup } from '@/context/PopupContext';
 import { FaGithub } from 'react-icons/fa';
+import { FcGoogle } from "react-icons/fc";
 
 function Login_Register_Content({ component }) {
 
@@ -25,9 +28,9 @@ function Login_Register_Content({ component }) {
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
-    const handleGitHubSignIn = async () => {
+    const handleOauthSignIn = async (provider) => {
         setLoading(true)
-        const signInResponse = await signIn('github', { redirectTo: "/home?githubloginsuccess=true" })
+        const signInResponse = await signIn(provider, { redirectTo: `/home?${provider}loginsuccess=true` })
         if (signInResponse?.error) {
             setLoading(false)
             setErrorMessage("Authentication Failed: ", signInResponse.error)
@@ -39,58 +42,34 @@ function Login_Register_Content({ component }) {
         ref.current.reset();
         setLoading(true)
 
-        try {
-            const apiPath = component === "login" ? "api/auth/login" : "api/auth/register";
-            const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/${apiPath}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            const result = await response.json()
+        const signInResult = await credentialsSignIn(data, component)
 
-            if (result.success) {
-                console.log(result.userData);
-                // const signInResponse = await signIn('credentials', {
-                //     redirect: false,
-                //     ...result.userData,
-                //     profileImage: JSON.stringify(result.userData.profileImage)
-                // })
-
-                // if (signInResponse?.error) {
-                //     setLoading(false)
-                //     showPopup(component === 'login' ? "Log In Failed !" : "Sign Up Failed !", "red")
-                //     setErrorMessage("Authentication Failed: ", signInResponse.error)
-                //     console.error(("Error During Sign In: ", signInResponse.error));
-                // }
-                // else {
-                //     showPopup(component === 'login' ? "Logged In Successfully !" : "Sign Up Successful !")
-                // }
-            } else {
-                setLoading(false)
-                setErrorMessage(result.message);
-                showPopup(component === 'login' ? "Log In Failed !" : "Sign Up Failed !", "red")
-            }
-        } catch (err) {
-            console.error("Error occured: ", err)
+        if (signInResult.success) {
+            showPopup(component === 'login' ? "Logged In Successfully !" : "Sign Up Successful !")
+            router.push(component === 'login' ? "/home" : "register/profile-setup")
+        }
+        else {
+            setErrorMessage(signInResult.error)
+            setLoading(false)
+            showPopup(component === 'login' ? "Log In Failed !" : "Sign Up Failed !", "red")
         }
 
     };
 
-    useEffect(() => {
-        if (user && user.oauthProvider) router.push('/home')
-        if (user && !user.oauthProvider)
-            router.push(component === 'login' ? "/home" : "/register/profile-setup");
-    }, [user])
-
+    if (user) redirect('/home')
 
     return (
         <div className="relative min-h-screen flex justify-center items-center px-4 w-full">
 
             {isLoading ? <Loader size={'h-16 w-16'} text={"Please Wait ..."} />
                 :
-                <div className='w-full flex flex-col items-center justify-center gap-5'>
+                <div className='w-full my-20 flex flex-col items-center justify-center gap-5'>
+
+                    {data &&
+                        <div className='text-white text-3xl'>
+                            Signed in <button onClick={() => signOut()}>Sign Out</button>
+                        </div>
+                    }
 
                     <div className='md:hidden text-2xl font-bold mb-10'>
                         LoopChat
@@ -129,30 +108,56 @@ function Login_Register_Content({ component }) {
                                 </div>
                             )}
 
+                            {component === 'register' &&
+                                <div className="w-full mb-6">
+                                    <input
+                                        name="username"
+                                        id="username"
+                                        placeholder="Username"
+                                        className="rounded-lg border border-white/20 w-full px-3 py-3 bg-inputField focus:outline-none focus:border-blue-500"
+                                        type="text"
+                                        {...register("username", {
+                                            required: "Username is required",
+                                            minLength: { value: 3, message: "Username must be at least 3 characters long!" },
+                                            validate: {
+                                                noSpaces: value => !/\s/g.test(value) || 'No spaces allowed in username',
+                                                isLowercase: value => value === value.toLowerCase() || 'Username must be lowercase only',
+                                                noDash: value => !/_/g.test(value) || 'Username cannot contain underscores (_)'
+                                            },
+                                        })}
+                                    />
+
+                                    {errors.username &&
+                                        <div className="text-red-500 text-center mt-2">
+                                            {errors.username.message}
+                                        </div>
+                                    }
+                                </div>
+                            }
+
                             <div className="w-full mb-6">
                                 <input
-                                    name="username"
-                                    id="username"
-                                    placeholder="Username"
+                                    name="email"
+                                    id="email"
+                                    placeholder="Email"
                                     className="rounded-lg border border-white/20 w-full px-3 py-3 bg-inputField focus:outline-none focus:border-blue-500"
                                     type="text"
-                                    {...register("username", {
-                                        required: "Username is required",
-                                        minLength: { value: 3, message: "Username must be at least 3 characters long!" },
-                                        validate: {
-                                            noSpaces: value => !/\s/g.test(value) || 'No spaces allowed in username',
-                                            isLowercase: value => value === value.toLowerCase() || 'Username must be lowercase only',
-                                            noDash: value => !/-/g.test(value) || 'Username cannot contain dashes (-)'
-                                        },
+                                    {...register("email", {
+                                        required: "Email is required",
+                                        pattern: {
+                                            value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                                            message: "Invalid email address"
+                                        }
                                     })}
                                 />
 
-                                {errors.username &&
+                                {errors.email &&
                                     <div className="text-red-500 text-center mt-2">
-                                        {errors.username.message}
+                                        {errors.email.message}
                                     </div>
                                 }
                             </div>
+
 
                             <div className="w-full mb-6">
                                 <input
@@ -191,13 +196,26 @@ function Login_Register_Content({ component }) {
                                     <button
                                         type='button'
                                         className='w-full flex flex-row items-center bg-white justify-center gap-5 hover:bg-white/80 text-black text-base md:text-lg transition-colors duration-300 font-semibold py-3 px-5 rounded-lg cursor-pointer'
-                                        onClick={handleGitHubSignIn}
+                                        onClick={() => handleOauthSignIn('github')}
                                     >
 
                                         <FaGithub
                                             className='h-7 w-7'
                                         />
                                         Sign in with Github
+                                    </button>
+                                </div>
+                                <div className='w-full'>
+                                    <button
+                                        type='button'
+                                        className='w-full flex flex-row items-center bg-white justify-center gap-5 hover:bg-white/80 text-black text-base md:text-lg transition-colors duration-300 font-semibold py-3 px-5 rounded-lg cursor-pointer'
+                                        onClick={() => handleOauthSignIn('google')}
+                                    >
+
+                                        <FcGoogle
+                                            className='h-7 w-7'
+                                        />
+                                        Sign in with Google
                                     </button>
                                 </div>
                             </div>

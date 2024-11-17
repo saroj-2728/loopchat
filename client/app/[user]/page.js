@@ -33,7 +33,7 @@ const UserProfile = () => {
                 <div className="text-center md:text-left mt-5 md:mt-0 md:ml-10 flex flex-col gap-3 md:gap-5">
                     {/* Username and Edit Button */}
                     <div className="flex items-center gap-4 justify-center md:justify-start">
-                        <h2 className="text-xl">
+                        <h2 className="text-xl truncate max-w-[150px]">
                             {user?.username}
                         </h2>
                         <Link href={`${pathname}/edit/edit-profile`} className="text-sm  font-medium bg-button-secondary hover:bg-button-secondary/90 px-3 md:px-4 py-1 md:py-2 rounded-md transition duration-150">
