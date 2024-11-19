@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useContext } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AllUsersContext } from "@/context/allUsersContext";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,10 +10,15 @@ import { GoArrowLeft } from "react-icons/go";
 
 export default function RootLayout({ children }) {
 
-    const { allUsers } = useContext(AllUsersContext)
     const pathname = usePathname()
+    const router = useRouter()
+
+    const { allUsers } = useContext(AllUsersContext)
+
     const messagePageRegex = /\/messages\/([^/]+)$/;
     const defaultProfileSrc = DefaultProfile()
+
+    const goBack = () => router.back()
 
     useEffect(() => {
         document.title = 'Messages'
@@ -29,12 +34,12 @@ export default function RootLayout({ children }) {
                         <div className="shadow-small rounded-lg p-4 md:px-0 w-full mx-auto text-center h-full flex flex-col">
 
                             <div className="flex items-center">
-                                <Link
-                                    href={'/home'}
+                                <div
+                                    onClick={goBack}
                                     className="md:hidden"
                                 >
                                     <GoArrowLeft className=" w-7 h-7" />
-                                </Link>
+                                </div>
                                 <h1 className="text-base md:w-full w-[85%] md:text-2xl font-bold text-center text-white">
                                     Messages
                                 </h1>

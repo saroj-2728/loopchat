@@ -25,6 +25,8 @@ const MessagePage = ({ params }) => {
   const [inputMessage, setInputMessage] = useState("")
   const [messages, setMessages] = useState([])
 
+  const goBack = () => router.back()
+
   const defaultProfileSrc = DefaultProfile()
 
   const isMobileDevice = () => {
@@ -38,7 +40,7 @@ const MessagePage = ({ params }) => {
       if (theUser)
         settargetUser(theUser)
       else
-        router.push(`/messages`)
+        router.back()
     };
     fetchUsersName();
   }, [allUsers, slug, router]);
@@ -125,12 +127,12 @@ const MessagePage = ({ params }) => {
 
       <div className="messageTo w-full flex flex-row items-center justify-start gap-3 text-center text-white font-medium text-base md:text-xl border-b border-white/20 py-2 md:py-4 px-4">
 
-        <Link
-          href={'/messages'}
+        <div
+          onClick={goBack}
           className="md:hidden"
         >
           <GoArrowLeft className=" w-7 h-7" />
-        </Link>
+        </div>
         <div className='flex justify-center w-[30px] h-[30px] md:w-[50px] md:h-[50px]'>
           <Image
             src={targetUser?.profileImage?.url || defaultProfileSrc}

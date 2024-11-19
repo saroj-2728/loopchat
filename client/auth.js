@@ -10,9 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 export const { handlers, signIn, signOut, auth } = NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
-        Google({
-            allowDangerousEmailAccountLinking: true
-        }),
+        Google,
         GitHub,
         Credentials({
             name: "Credentials",
@@ -45,21 +43,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return true;
         },
         jwt({ token, user, account }) {
-            if (user && account.provider !== "credentials" ) {
+            if (user && account.provider !== "credentials") {
                 const { password, ...userWithoutPassword } = user;
                 token.user = userWithoutPassword;
             }
-            // if (user && account.provider === "credentials" ) {
-            //     console.log(user, token);
-            //     const { password, ...userWithoutPassword } = user;
-            //     token.user = userWithoutPassword;
-            // }
+            if (user && account.provider === "credentials") {
+                // console.log(user, token);
+                // const { password, ...userWithoutPassword } = user;
+                token.user = user;
+            }
             return token
         },
 
         async session({ session, token }) {
             session.user = token.user;
-            
+
             return session;
         },
     },
