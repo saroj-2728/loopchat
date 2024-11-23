@@ -1,30 +1,51 @@
-# The Next Chat App
+# LoopChat
 
-This is a real-time chat application built using **Next.js**, **Express.js**, **Tailwind CSS** for styling, and **MongoDB** for data storage. The app supports user registration, login, and messaging functionality with a responsive design.
+LoopChat is a dynamic real-time chat application built using Next.js, Express.js, Tailwind CSS, and MongoDB. It supports user registration and authentication powered by Firebase Auth, real-time messaging, profile uploads, profile editing, and more. Designed with a responsive, mobile-friendly interface, LoopChat delivers a seamless user experience across devices.
 
-Check out the live app: [The Next Chat App](https://next-js-chat-app-5lgs.vercel.app/)
+## Live Demo
+Check out the live app: [LoopChat](https://next-js-chat-app-5lgs.vercel.app/)
 
-## About This Repository
-
-This repository contains two branches with slightly different implementations of backend connectivity:
-
-- **Main branch**: Uses **Next.js** for the frontend, with **Express.js** managing the backend database connections and socket events.
-- **next-with-server-actions branch**: Implements **Next.js Server Actions** for database connectivity, utilizing **Express.js** only for managing the socket server.
+---
 
 ## Features
 
-- **Real-time messaging**: Instant messaging between users.
-- **User Authentication**: Secure login and registration.
+- **Real-time Messaging**: Instant messaging between users.
+- **User Authentication**:
+  - Email/Password authentication
+  - Google Sign-in integration
+  - GitHub Sign-in integration
+  - Secure session management
+- **Profile Management**:
+  - Upload and update profile pictures
+  - Edit user details
 - **Responsive Design**: Mobile-friendly interface using Tailwind CSS.
-- **Persistent User Sessions**: Maintains user sessions with cookies and localStorage.
-- **Database**: MongoDB for storing user data.
+- **Persistent User Sessions**: Maintains user sessions with firebase.
+- **Database**: MongoDB for storing user data.  
+---
 
 ## Technologies Used
 
-- **Next.js** (with App Router)
-- **Express.js** (For Socket.io server and backend services)
-- **Socket.io** (For real-time client-server messaging)
-- **Tailwind CSS** (For modern, responsive UI design)
-- **MongoDB** (For database storage)
-- **Mongoose** (ODM for MongoDB)
-- **React Hook Form** (For form validation)
+### Frontend (Next.js Client)
+
+- **Next.js (v14.2)** with App Router
+- **Firebase Authentication**:
+  - Email/Password authentication
+  - Google OAuth provider
+  - GitHub OAuth provider
+- **Socket.io-client (v4.8.0)** for real-time messaging
+- **React Hook Form (v7.53.0)** for form handling and validation
+- **React Icons (v5.3.0)** for UI icons
+- **js-cookie (v3.0.5)** for cookie management
+- **Tailwind CSS (v3.4.1)** for styling
+- **Mongoose (v8.6.2)** for database operations
+
+### Backend (Express Server)
+
+- **Express.js (v4.21.0)** for server implementation
+- **Socket.io (v4.8.0)** for real-time server events and messaging
+- **Cloudinary (v2.5.1)** for file storage and management
+- **Firebase Admin (v13.0.0)** for server-side authentication
+- **Mongoose (v8.7.2)** for MongoDB operations
+- **Multer** for file upload handling
+
+---
