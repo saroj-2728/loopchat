@@ -1,17 +1,17 @@
 "use client";
-import { useState, useContext, useRef } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { UserContext } from "@/context/userContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import DefaultProfile from "@/utilities/DefaultProfile";
 import { usePopup } from "@/context/PopupContext";
 import Loader from "@/components/Loader";
+import { useSession } from "@/context/SessionContext";
 
 const ProfileEdit = () => {
 
-    const { user, setUser } = useContext(UserContext);
+    const { profile } = useSession()
     const router = useRouter()
     const { showPopup } = usePopup()
 
@@ -19,7 +19,7 @@ const ProfileEdit = () => {
     const [errorMessage, setErrorMessage] = useState("")
     const [fileSizeError, setFileSizeError] = useState("")
     const [isLoading, setLoading] = useState(false)
-    const [imagePreview, setImagePreview] = useState(user?.profileImage?.url || DefaultProfile());
+    const [imagePreview, setImagePreview] = useState(profile?.profileImage?.url || DefaultProfile());
 
     const fileInputRef = useRef(null);
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -36,27 +36,27 @@ const ProfileEdit = () => {
         updatedData.append("bio", formData.bio);
         if (profileImage) {
             updatedData.append("profileImage", profileImage);
-            updatedData.append("previousPublicId", user.profileImage?.public_id);
+            updatedData.append("previousPublicId", profile.profileImage?.public_id);
         }
 
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/${user.username}/update-profile`, {
-                method: "PUT",
-                body: updatedData,
-            });
-            const result = await response.json()
-            if (result.success) {
-                setUser(result.userData);
-                showPopup("Profile Updated Successfully !")
-                router.push(`/${result.userData?.username}`)
-            } else {
-                setLoading(false)
-                setErrorMessage(result.message);
-                showPopup("Profile Updation Failed !", "red")
-            }
-        } catch (error) {
-            console.error("Error updating profile:", error);
-        }
+        // try {
+        //     const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/${profile.username}/update-profile`, {
+        //         method: "PUT",
+        //         body: updatedData,
+        //     });
+        //     const result = await response.json()
+        //     if (result.success) {
+        //         setUser(result.userData);
+        //         showPopup("Profile Updated Successfully !")
+        //         router.push(`/${result.userData?.username}`)
+        //     } else {
+        //         setLoading(false)
+        //         setErrorMessage(result.message);
+        //         showPopup("Profile Updation Failed !", "red")
+        //     }
+        // } catch (error) {
+        //     console.error("Error updating profile:", error);
+        // }
     };
 
     const handleImageChange = (event) => {
@@ -99,8 +99,8 @@ const ProfileEdit = () => {
                                     </div>
                                 )}
                                 <div className="flex flex-col">
-                                    <span className="text-sm md:text-lg font-bold">{user?.username}</span>
-                                    <span className="text-white/60 text-xs md:text-base">{user?.name}</span>
+                                    <span className="text-sm md:text-lg font-bold">{profile?.username}</span>
+                                    <span className="text-white/60 text-xs md:text-base">{profile?.name}</span>
                                 </div>
                             </div>
                             <div>
@@ -199,7 +199,7 @@ const ProfileEdit = () => {
                                 Save Changes
                             </button>
                             <Link
-                                href={`/${user?.username}`}
+                                href={`/${profile?.username}`}
                                 className="w-full text-white text-center font-medium bg-button-secondary hover:bg-button-secondary/90 px-3 md:px-4 py-3 rounded-lg transition duration-300"
                             >
                                 Cancel
@@ -212,13 +212,13 @@ const ProfileEdit = () => {
                         <p>Looking for something else ?</p>
                         <div className="w-full mx-auto flex flex-row py-2 justify-center gap-5">
                             <Link
-                                href={`/${user?.username}/edit/change-password`}
+                                href={`/${profile?.username}/edit/change-password`}
                                 className="text-sky-500"
                                 >
                                 Change Password
                             </Link>
                             <Link
-                                href={`/${user?.username}/edit/delete-profile`}
+                                href={`/${profile?.username}/edit/delete-profile`}
                                 className="text-sky-500"
                                 >
                                 Delete Profile

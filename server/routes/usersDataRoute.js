@@ -3,6 +3,6 @@ import { handleALlUsersList } from "../controllers/allUsersDataController.js";
 
 const router = express.Router();
 
-router.post('/users', handleALlUsersList);
+router.get('/users', handleALlUsersList);
 
 export default router;

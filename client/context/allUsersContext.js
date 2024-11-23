@@ -14,16 +14,14 @@ const AllUsersProvider = ({ children }) => {
         const fetchUsers = async () => {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users`, {
-                    method: "POST",
+                    method: "GET",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ data: "Users" })
                 })
                 const data = await response.json()
                 setAllUsers(data)
                 setLoading(false)
-
             } catch (err) {
                 setError("Failed to fetch users.");
                 console.error(err);

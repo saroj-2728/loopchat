@@ -3,26 +3,27 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
+import { useSession } from "@/context/SessionContext";
 
 export default function Home() {
 
+  const { user } = useSession()
   const router = useRouter();
   const [isLoading, setLoading] = useState(true)
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-
-    if (isLoggedIn) {
+    setLoading(true)
+    if (user?.uid) {
       router.push('/home');
     } else {
       setLoading(false);
     }
-  }, [router]);
+  }, [user?.uid, router]);
 
   return (
     <>
       <div className='w-full md:min-h-screen min-h-[calc(100vh-64px)] flex items-center justify-center px-4 md:px-0'>
-        {isLoading ? (<Loader size={'h-16 w-16'} text={"Please Wait ..."}/>) : (
+        {isLoading ? (<Loader size={'h-16 w-16'} text={"Please Wait ..."} />) : (
           <div className='max-w-[1440px] md:mt-24 md:mb-24'>
 
             <section className="flex flex-col items-center text-center transition-all duration-500 ease-in-out text-white px-6 py-6 md:px-16 md:py-10 rounded-lg shadow-custom">

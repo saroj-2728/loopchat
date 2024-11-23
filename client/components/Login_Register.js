@@ -1,70 +1,95 @@
 "use client"
-import React, { useState, useRef, useContext, Suspense } from 'react'
+import React, { useState, useRef, Suspense } from 'react'
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { UserContext } from '@/context/userContext';
 import Loader from './Loader';
 import { usePopup } from '@/context/PopupContext';
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from 'react-icons/fa';
+import { useSession } from '@/context/SessionContext';
+import { redirect } from 'next/navigation';
+import { FaEye } from "react-icons/fa";
 
 function Login_Register_Content({ component }) {
 
+    const { profile, user, signInWithEmail, signUpWithEmail, signInWithGithub, signInWithGoogle } = useSession()
+
     const router = useRouter()
-    const { showPopup } = usePopup()
     const searchParams = useSearchParams()
-    const redirected = searchParams.get('redirected')
+
+    const { showPopup } = usePopup()
+    const continueTo = searchParams.get('continueTo')
+
     const [errorMessage, setErrorMessage] = useState("")
     const [isLoading, setLoading] = useState(false)
     const [loggedIn, setloggedIn] = useState(false)
+    const [passwordVisible, setPasswordVisible] = useState(false);
+
     const ref = useRef();
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
-    const { login } = useContext(UserContext);
+    const googleSignIn = async () => {
+        setLoading(true)
+        const result = await signInWithGoogle()
+        if (result.success) {
+            showPopup("Signed In With Google!")
+            router.push(continueTo || '/home')
+        }
+        else {
+            showPopup("Sign In Failed!", "red")
+            setLoading(false)
+            setErrorMessage(result.message)
+        }
+    }
+    const githubSignIn = async () => {
+        setLoading(true)
+        const result = await signInWithGithub()
+        if (result.success) {
+            showPopup("Signed In With Github!")
+            router.push(continueTo || '/home')
+        }
+        else {
+            showPopup("Sign In Failed!", "red")
+            setLoading(false)
+            setErrorMessage(result.message)
+        }
+    }
     const onSubmit = async (data) => {
         ref.current.reset();
         setLoading(true)
-
-        try {
-            const apiPath = component === "login" ? "api/auth/login" : "api/auth/register";
-            const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/${apiPath}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            const result = await response.json()
-
-            if (result?.success) {
-                setloggedIn(true)
-                login(result.userData)
-                showPopup(component === 'login' ? "Logged In Successfully !" : "Sign Up Successful !")
-                router.push(component === 'login' ? "/home" : "/register/profile-setup");
-            } else {
-                setLoading(false)
-                setErrorMessage(result.message);
-                showPopup(component === 'login' ? "Log In Failed !" : "Sign Up Failed !", "red")
-            }
-        } catch (err) {
-            console.error("Error occured: ", err)
+        let result;
+        if (component === "login") {
+            result = await signInWithEmail(data)
         }
-
+        else {
+            result = await signUpWithEmail(data)
+        }
+        if (result.success) {
+            showPopup(component === "login" ? "Signed In" : "Signed Up" + " Successfully!")
+            router.push(continueTo || '/home')
+        }
+        else {
+            showPopup(`Sign ${component === 'login' ? "In" : "Up"} Failed!`, "red")
+            setLoading(false)
+            setErrorMessage(result.message)
+        }
     };
 
+    if (user?.uid) redirect('/home')
 
     return (
         <div className="relative min-h-screen flex justify-center items-center px-4 w-full">
 
             {isLoading ? <Loader size={'h-16 w-16'} text={"Please Wait ..."} />
                 :
-                <div className='w-full flex flex-col items-center justify-center gap-5'>
-
+                <div className='w-full flex flex-col items-center justify-center gap-5 my-20'>
                     <div className='md:hidden text-2xl font-bold mb-10'>
                         LoopChat
                     </div>
 
-                    {redirected && (
+                    {continueTo && (
                         <div className="mb-5 md:mb-8 text-xl sm:text-2xl">
                             Please login to continue
                         </div>
@@ -75,7 +100,7 @@ function Login_Register_Content({ component }) {
                         <form ref={ref} onSubmit={handleSubmit(onSubmit)} className={`w-full ${!loggedIn ? 'block' : 'hidden'}`}>
 
                             <h2 className="text-center mb-8 text-xl sm:text-2xl font-bold">
-                                {component === 'login' ? "Login" : "Sign Up"}
+                                {component === 'login' ? "Login" : "Create New Account"}
                             </h2>
 
                             {component === 'register' && (
@@ -90,54 +115,90 @@ function Login_Register_Content({ component }) {
                                     />
 
                                     {errors.name &&
-                                    <div className="text-red-500 text-center mt-2">
-                                        {errors.name.message}
-                                    </div>
-                                }
+                                        <div className="text-red-500 text-center mt-2">
+                                            {errors.name.message}
+                                        </div>
+                                    }
                                 </div>
                             )}
 
+                            {component === "register" &&
+                                <div className="w-full mb-6">
+                                    <input
+                                        name="username"
+                                        id="username"
+                                        placeholder="Username"
+                                        className="rounded-lg border border-white/20 w-full px-3 py-3 bg-inputField focus:outline-none focus:border-blue-500"
+                                        type="text"
+                                        {...register("username", {
+                                            required: "Username is required",
+                                            minLength: { value: 3, message: "Username must be at least 3 characters long!" },
+                                            validate: {
+                                                noSpaces: value => !/\s/g.test(value) || 'No spaces allowed in username',
+                                                isLowercase: value => value === value.toLowerCase() || 'Username must be lowercase only'
+                                            },
+                                        })}
+                                    />
+
+                                    {errors.username &&
+                                        <div className="text-red-500 text-center mt-2">
+                                            {errors.username.message}
+                                        </div>
+                                    }
+                                </div>
+                            }
+
                             <div className="w-full mb-6">
                                 <input
-                                    name="username"
-                                    id="username"
-                                    placeholder="Username"
+                                    name="email"
+                                    id="email"
+                                    placeholder="Email"
                                     className="rounded-lg border border-white/20 w-full px-3 py-3 bg-inputField focus:outline-none focus:border-blue-500"
-                                    type="text"
-                                    {...register("username", {
-                                        required: "Username is required",
-                                        minLength: { value: 3, message: "Username must be at least 3 characters long!" },
-                                        validate: {
-                                            noSpaces: value => !/\s/g.test(value) || 'No spaces allowed in username',
-                                            isLowercase: value => value === value.toLowerCase() || 'Username must be lowercase only'
+                                    type="email"
+                                    {...register('email', {
+                                        required: 'Email is required',
+                                        pattern: {
+                                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                                            message: 'Please enter a valid email address',
                                         },
                                     })}
                                 />
 
-                                {errors.username &&
+                                {errors.email &&
                                     <div className="text-red-500 text-center mt-2">
-                                        {errors.username.message}
+                                        {errors.email.message}
                                     </div>
                                 }
                             </div>
 
                             <div className="w-full mb-6">
+                                <div className='relative w-full'>
                                 <input
                                     name="password"
                                     id="password"
                                     placeholder="Password"
                                     className="rounded-lg border border-white/20 w-full px-3 py-3 bg-inputField focus:outline-none focus:border-blue-500"
-                                    type="password"
+                                    type={passwordVisible ? "text" : "password"}
                                     {...register("password", {
                                         required: "Password is required",
                                         minLength: { value: 8, message: "Password must be at least 8 characters long!" },
                                     })}
                                 />
 
-                                {errors.password && <div className="text-red-500 text-center mt-2">{errors.password.message}</div>}
+                                <FaEye
+                                    onClick={() => setPasswordVisible(!passwordVisible)}
+                                    className={`absolute top-1/2 right-[2%] transform -translate-y-1/2 text-gray-500 hover:text-gray-50 hover:bg-gray-800 ${passwordVisible? "text-blue-500 border border-blue-500": ""} transition duration-300 rounded-full p-1 md:p-2 box-content cursor-pointer`}
+                                />
+                                </div>
 
-                                {errorMessage && <div className="text-red-500 text-center mt-2">{errorMessage}</div>}
+                                {errors.password && <div className="text-red-500 text-center mt-2">{errors.password.message}</div>}
                             </div>
+
+                            {errorMessage &&
+                                <div className="text-red-500 text-center my-2">
+                                    {errorMessage}
+                                </div>
+                            }
 
                             <div className="w-full mb-6">
                                 <input
@@ -148,13 +209,43 @@ function Login_Register_Content({ component }) {
                                 />
                             </div>
 
-                            {component === "login" &&
-                                <div className='w-full flex flex-col gap-4'>
-                                    <div className='flex flex-row items-center justify-center'>
-                                        <div className='w-2/5 border border-white/20' />
-                                        <p className='w-1/5 text-center text-white/60'>OR</p>
-                                        <div className='w-2/5 border border-white/20' />
+
+
+
+                            <div className='w-full flex flex-col gap-4'>
+                                <div className='flex flex-row items-center justify-center'>
+                                    <div className='w-2/5 border border-white/20' />
+                                    <p className='w-1/5 text-center text-white/60'>OR</p>
+                                    <div className='w-2/5 border border-white/20' />
+                                </div>
+                                <div className='w-full my-3 flex flex-col gap-4'>
+                                    <div className='w-full'>
+                                        <button
+                                            className='w-full flex items-center justify-center gap-5 transition duration-300 py-3 bg-white hover:bg-white/80 text-black rounded-lg text-lg font-semibold'
+                                            type='button'
+                                            onClick={googleSignIn}
+                                        >
+                                            <FcGoogle
+                                                className='md:w-8 md:h-8 h-7 w-7'
+                                            />
+                                            <div>Sign In With Google</div>
+                                        </button>
                                     </div>
+
+                                    <div className='w-full'>
+                                        <button
+                                            className='w-full flex items-center justify-center gap-5 transition duration-300 py-3 bg-white hover:bg-white/80 text-black rounded-lg text-lg font-semibold'
+                                            type='button'
+                                            onClick={githubSignIn}
+                                        >
+                                            <FaGithub
+                                                className='md:w-8 md:h-8 h-7 w-7'
+                                            />
+                                            <div>Sign In With GitHub</div>
+                                        </button>
+                                    </div>
+                                </div>
+                                {component === "login" &&
                                     <div className='w-full flex items-center justify-center'>
                                         <Link
                                             href={'/'}
@@ -163,8 +254,8 @@ function Login_Register_Content({ component }) {
                                             Forgotten your password?
                                         </Link>
                                     </div>
-                                </div>
-                            }
+                                }
+                            </div>
                         </form>
                     </div>
 

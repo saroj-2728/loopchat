@@ -1,7 +1,7 @@
 'use client'
 import { useContext, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { UserContext } from "@/context/userContext";
+import { UserContext } from "@/context/ProfileContext";
 import Link from "next/link";
 import Image from "next/image";
 import { useForm } from "react-hook-form";

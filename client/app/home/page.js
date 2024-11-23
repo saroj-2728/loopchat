@@ -1,19 +1,22 @@
 "use client"
-import { UserContext } from '@/context/userContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import Loader from '@/components/Loader';
+import { useSession } from '@/context/SessionContext';
+import { signOut } from 'firebase/auth';
+import auth from '@/Firebase';
 
 const Home = () => {
 
-    const { user, logout } = useContext(UserContext)
+    const { profile, setProfile } = useSession()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
 
-    const handleLogOut = () => {
+    const handleLogOut = async () => {
         setLoading(true)
-        logout();
+        setProfile(null)
+        await signOut(auth)
         router.push('/')
     }
 
@@ -24,7 +27,7 @@ const Home = () => {
                     :
                     <div className="shadow-custom rounded-lg p-6 sm:p-8 md:p-10 text-center flex flex-col gap-4 w-full max-w-md">
                         <h1 className="text-3xl sm:text-4xl font-bold text-sky-500">
-                            Welcome, {user?.name || "User"}!
+                            Welcome, {profile?.name || "User"}!
                         </h1>
                         <p className="text-white text-base sm:text-lg">
                             Start messaging now with the other users there.

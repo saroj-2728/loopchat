@@ -1,29 +1,22 @@
 import { NextResponse } from 'next/server';
 
 export function middleware(request) {
-  const { pathname } = request.nextUrl;
-  const userCookie = request.cookies.get('user');
-  const isLoggedIn = Boolean(userCookie);
+    const publicPaths = ['/', '/about', '/contact', '/login', '/register'];
+    const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
 
-  // Public paths that everyone can access
-  const publicPaths = ['/', '/about', '/contact', '/login', '/register'];
-  if (publicPaths.includes(pathname)) {
+    const pathname = request.nextUrl.pathname;
+
+    const userCookie = request.cookies.get('userStatus');
+
+    if (!userCookie && !isPublicPath) {
+        return NextResponse.redirect(new URL(`/login?continueTo=${pathname}`, request.nextUrl.origin));
+    }
+
     return NextResponse.next();
-  }
-
-  // If logged in, allow access to any page
-  if (isLoggedIn) {
-    return NextResponse.next();
-  }
-
-  // If not logged in, redirect to /login with query string for feedback
-  if (!isLoggedIn) {
-    return NextResponse.redirect(new URL('/login?redirected=true', request.url));
-  }
 }
 
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
+    matcher: [
+        '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    ],
 };

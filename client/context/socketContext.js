@@ -1,7 +1,7 @@
 "use client"
 import { createContext, useContext, useRef, useEffect } from "react";
 import { io } from 'socket.io-client';
-import { UserContext } from "./userContext";
+import { useSession } from "./SessionContext";
 
 const SocketContext = createContext();
 
@@ -10,20 +10,19 @@ export const useSocket = () => {
 }
 
 export const SocketProvider = ({ children }) => {
-    const { user } = useContext(UserContext)
+    const { profile } = useSession()
     const socketRef = useRef(null)
-
     useEffect(() => {
-        if (!user?.username) return;
+        if (!profile?.username) return;
 
         const socket = io(process.env.NEXT_PUBLIC_SERVER_URL);
         socketRef.current = socket;
-        socketRef.current.emit("register", user.username)
+        socketRef.current.emit("register", profile.username)
 
         return () => {
             socket.disconnect()
         }
-    }, [user])
+    }, [profile])
 
     return (
         <SocketContext.Provider value={socketRef}>

@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes.js';
+import userInfoRoute from './routes/userInfoRoute.js';
 import usersDataRoute from './routes/usersDataRoute.js';
 import profileSetUpRoute from './routes/profileSetUpRoute.js'
 import profileUpdateRoute from './routes/profileUpdateRoute.js'
@@ -18,7 +18,7 @@ app
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     }));
 
-app.use('/api/auth', authRoutes);
+app.use('/api/user', userInfoRoute);
 app.use('/api', usersDataRoute)
 app.use('/api', profileSetUpRoute)
 app.use('/api', profileUpdateRoute)

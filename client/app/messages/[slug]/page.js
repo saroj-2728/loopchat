@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useState, useRef, useContext } from 'react'
-import { UserContext } from '@/context/userContext';
 import { AllUsersContext } from '@/context/allUsersContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -9,10 +8,14 @@ import { useSocket } from '@/context/socketContext';
 import Loader from '@/components/Loader';
 import DefaultProfile from '@/utilities/DefaultProfile';
 import { GoArrowLeft } from "react-icons/go";
+import { useSession } from '@/context/SessionContext';
+import auth from '@/Firebase';
 
 const MessagePage = ({ params }) => {
 
-  const { user: userMe } = useContext(UserContext);
+  const { profile } = useSession()
+  const currentUser = auth.currentUser;
+
   const { allUsers } = useContext(AllUsersContext)
   const router = useRouter()
 
@@ -44,9 +47,17 @@ const MessagePage = ({ params }) => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/messages/${userMe.username}/${targetUser.username}`);
+        const token = await currentUser.getIdToken()
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/messages/${profile.username}/${targetUser.username}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+
+        });
         const result = await response.json();
-        
+
         if (response.ok) {
           setMessages(result);
         } else {
@@ -57,11 +68,11 @@ const MessagePage = ({ params }) => {
       }
     };
 
-    if (targetUser.username && userMe.username) {
+    if (targetUser?.username && profile?.username && currentUser) {
       fetchMessages();
     }
 
-  }, [targetUser, userMe]);
+  }, [targetUser, profile]);
 
   useEffect(() => {
     document.title = `Message ${targetUser.name}`
@@ -72,7 +83,7 @@ const MessagePage = ({ params }) => {
 
     // Listen for incoming messages 
     socket?.on('privateMessage', (data) => {
-      if (data.senderId === targetUser.username && userMe.username === data.receiverId) {
+      if (data.senderId === targetUser.username && profile.username === data.receiverId) {
         setMessages((prevMessages) => [
           ...prevMessages,
           data,
@@ -83,7 +94,7 @@ const MessagePage = ({ params }) => {
     return () => {
       socket?.off('privateMessage');
     };
-  }, [userMe, targetUser, socketRef]);
+  }, [profile, targetUser, socketRef]);
 
   useEffect(() => {
     const delay = isMobileDevice() ? 200 : 10;
@@ -101,14 +112,14 @@ const MessagePage = ({ params }) => {
     setMessages((prevMessages) => [
       ...prevMessages,
       {
-        senderId: userMe.username,
+        senderId: profile.username,
         receiverId: targetUser.username,
         content: inputMessage,
       },
     ]);
 
     socketRef.current.emit('privateMessage', {
-      senderId: userMe.username,
+      senderId: profile.username,
       receiverId: targetUser.username,
       content: inputMessage,
       timestamp: new Date().toISOString(),
@@ -146,9 +157,9 @@ const MessagePage = ({ params }) => {
           messages.map((msgObj, index) => (
             <div
               key={index}
-              className={`flex flex-row w-full ${msgObj.senderId === userMe?.username ? "justify-end" : "justify-start"} items-center gap-2 md:gap-3 my-5`}
+              className={`flex flex-row w-full ${msgObj.senderId === profile?.username ? "justify-end" : "justify-start"} items-center gap-2 md:gap-3 my-5`}
             >
-              {msgObj.senderId !== userMe?.username &&
+              {msgObj.senderId !== profile?.username &&
                 <div className='flex justify-center w-[30px] h-[30px] md:h-[38px] md:w-[38px]'>
                   <Image
                     src={targetUser?.profileImage?.url}
@@ -159,7 +170,7 @@ const MessagePage = ({ params }) => {
                   />
                 </div>
               }
-              <span className={`rounded-xl md:py-2 py-1 px-4 md:px-5 text-lg ${msgObj.senderId === userMe?.username ? "bg-sky-500 rounded-br" : "bg-gray-600/50 rounded-bl"} text-white max-w-[50%]`}>
+              <span className={`rounded-xl md:py-2 py-1 px-4 md:px-5 text-lg ${msgObj.senderId === profile?.username ? "bg-sky-500 rounded-br" : "bg-gray-600/50 rounded-bl"} text-white max-w-[50%]`}>
                 {msgObj.content}
               </span>
             </div>

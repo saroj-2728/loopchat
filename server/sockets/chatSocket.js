@@ -5,14 +5,13 @@ import connectToDatabase from "../lib/mongodb.js";
 
 const handlePrivateMessage = async (socket, { senderId, receiverId, content, timestamp }) => {
     const receiverSocketId = connectedUsers[receiverId];
-
     const newMessage = new Message({
         senderId,
         receiverId,
         content,
         timestamp: new Date()
     });
-
+    
     await newMessage.save()
 
     if (receiverSocketId) {

@@ -1,13 +1,13 @@
 'use client'
-import { UserContext } from "@/context/userContext"
+import { useSession } from "@/context/SessionContext"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useContext, useEffect } from "react"
+import { useEffect } from "react"
 
 export default function RootLayout({ children }) {
 
     const pathname = usePathname()
-    const { user } = useContext(UserContext)
+    const { profile } = useSession()
 
     useEffect(() => {
         document.title = "Edit Profile"
@@ -23,19 +23,19 @@ export default function RootLayout({ children }) {
                     </h1>
                     <div className="flex flex-col w-full px-5 gap-3">
                         <Link
-                            href={`/${user?.username}/edit/edit-profile`}
+                            href={`/${profile?.username}/edit/edit-profile`}
                             className={`${pathname.includes('edit-profile') ? "bg-accent/80" : ""} hover:bg-accent py-4 rounded-lg px-4 transition duration-300 font-medium`}
                         >
                             Edit Profile
                         </Link>
                         <Link
-                            href={`/${user?.username}/edit/change-password`}
+                            href={`/${profile?.username}/edit/change-password`}
                             className={`${pathname.includes('change-password') ? "bg-accent/80" : ""} hover:bg-accent py-4 rounded-lg px-4  transition duration-300 font-medium`}
                         >
                             Change Password
                         </Link>
                         <Link
-                            href={`/${user?.username}/edit/delete-profile`}
+                            href={`/${profile?.username}/edit/delete-profile`}
                             className={`${pathname.includes('delete-profile') ? "bg-accent/80" : ""} hover:bg-accent py-4 rounded-lg px-4  transition duration-300 font-medium`}
                         >
                             Delete Profile

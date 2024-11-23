@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
+    uid: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     name: {
         type: String,
         required: true,
@@ -14,7 +19,7 @@ const userSchema = new Schema({
     },
     email: {
         type: String,
-        required: false,
+        required: true,
         unique: false,
     },
     bio: {
@@ -22,18 +27,26 @@ const userSchema = new Schema({
         required: false,
         unique: false,
     },
-    password: {
+    provider: {
         type: String,
         required: true,
+        unique: false,
+    },
+    emailVerified: {
+        type: Boolean,
+        required: true,
+        unique: false,
     },
     profileImage: {
         url: {
             type: String,
             required: false,
+            unique: false,
         },
         public_id: {
             type: String,
             required: false,
+            unique: false,
         },
     },
 });
