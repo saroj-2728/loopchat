@@ -1,17 +1,17 @@
 'use client'
-import { useContext, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { UserContext } from "@/context/ProfileContext";
 import Link from "next/link";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import Loader from "@/components/Loader";
 import { usePopup } from "@/context/PopupContext";
 import DefaultProfile from "@/utilities/DefaultProfile";
+import { useSession } from "@/context/SessionContext";
 
 export default function ProfileSetup() {
 
-    const { user, setUser } = useContext(UserContext)
+    const { profile } = useSession()
     const router = useRouter()
     const { showPopup } = usePopup()
 
@@ -43,7 +43,7 @@ export default function ProfileSetup() {
 
         setLoading(true)
         const form = new FormData();
-        form.append('username', user.username);
+        form.append('username', profile?.username);
         form.append('email', formData.email);
         form.append('bio', formData.bio);
         if (profileImage) {
@@ -96,8 +96,8 @@ export default function ProfileSetup() {
                                     </div>
                                 )}
                                 <div className="flex flex-col">
-                                    <span className="text-sm md:text-lg font-bold">{user?.username}</span>
-                                    <span className="text-white/60 text-xs md:text-base">{user?.name}</span>
+                                    <span className="text-sm md:text-lg font-bold">{profile?.username}</span>
+                                    <span className="text-white/60 text-xs md:text-base">{profile?.name}</span>
                                 </div>
                             </div>
                             <div>

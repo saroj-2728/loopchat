@@ -72,7 +72,7 @@ const MessagePage = ({ params }) => {
       fetchMessages();
     }
 
-  }, [targetUser, profile]);
+  }, [targetUser, profile, currentUser]);
 
   useEffect(() => {
     document.title = `Message ${targetUser.name}`
