@@ -15,7 +15,7 @@ const MobileNav = () => {
 
     return (
         !isMessagesPage &&
-        <div className="block md:hidden fixed w-full bottom-0 z-50">
+        <div className="block md:hidden fixed w-full bottom-0 z-50 bg-black">
             <div id="mobile-menu" className="flex flex-row border-t border-t-white/20">
                 <Link
                     href={profile?.username ? `/home` : `/`}

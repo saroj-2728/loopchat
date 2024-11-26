@@ -4,19 +4,17 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Loader from '@/components/Loader';
 import { useSession } from '@/context/SessionContext';
-import { signOut } from 'firebase/auth';
-import auth from '@/Firebase';
 
 const Home = () => {
 
-    const { profile, setProfile } = useSession()
+    const { profile, setProfile, handleSignOut } = useSession()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
 
     const handleLogOut = async () => {
         setLoading(true)
         setProfile(null)
-        await signOut(auth)
+        handleSignOut()
         router.push('/')
     }
 

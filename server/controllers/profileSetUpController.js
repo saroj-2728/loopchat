@@ -3,13 +3,13 @@ import connectToDatabase from '../lib/mongodb.js';
 import cloudinary from 'cloudinary';
 
 export const handleProfileSetUp = async (req, res) => {
-    const { username, email, bio } = req.body;
+    const { uid, bio } = req.body;
     const profileImage = req.file;
 
     try {
         await connectToDatabase()
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ uid });
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -53,17 +53,13 @@ export const handleProfileSetUp = async (req, res) => {
             }
         }
 
-        if (email) user.email = email;
         if (bio) user.bio = bio;
 
         await user.save();
 
         return res.status(200).json({
             success: true,
-            userData: {
-                username: user.username,
-                name: user.name,
-                email: user?.email,
+            updatedData: {
                 bio: user?.bio,
                 profileImage: user.profileImage,
             },

@@ -10,11 +10,10 @@ import { usePathname } from 'next/navigation';
 import DefaultProfile from '@/utilities/DefaultProfile';
 import MobileNav from './MobileNav';
 import { useSession } from '@/context/SessionContext';
-import { signOut } from 'firebase/auth';
 import auth from '@/Firebase';
 
 const Navbar = () => {
-    const { profile, user } = useSession()
+    const { profile, user, handleSignOut } = useSession()
     const pathname = usePathname()
     const isMessagesPage = pathname.includes('/messages') && user;
     const router = useRouter();
@@ -35,7 +34,7 @@ const Navbar = () => {
 
     const handleLogoutClick = () => {
         togglePopup();
-        signOut(auth)
+        handleSignOut()
         router.push('/')
     }
 

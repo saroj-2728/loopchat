@@ -6,6 +6,7 @@ import { SocketProvider } from "@/context/socketContext";
 import { PopupProvider } from "@/context/PopupContext";
 import Popup from "@/components/Popup";
 import { SessionProvider } from "@/context/SessionContext";
+import GithubRepo from "@/components/GithubRepo";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <GithubRepo />
         <PopupProvider>
           <Popup />
           <SessionProvider>

@@ -4,13 +4,12 @@ import cloudinary from 'cloudinary';
 
 export const handleProfileUpdate = async (req, res) => {
 
-    const { prevUser } = req.params;
-    const { name, username, email, bio, previousPublicId } = req.body;
+    const { uid, name, username, bio, previousPublicId } = req.body;
     const profileImage = req.file;
 
     try {
         await connectToDatabase()
-        const user = await User.findOne({ username: prevUser }).select('-password');
+        const user = await User.findOne({ uid })
 
         if (!user)
             return res.status(404).json({
@@ -30,8 +29,7 @@ export const handleProfileUpdate = async (req, res) => {
 
         user.name = name;
         user.username = username;
-        user.email = email ? email : "";
-        user.bio = bio ? bio : "";
+        user.bio = bio || "";
 
         if (profileImage) {
             if (previousPublicId)
@@ -72,7 +70,12 @@ export const handleProfileUpdate = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            userData: user,
+            updatedData: {
+                name: user.name,
+                username: user.username,
+                bio: user?.bio,
+                profileImage: user.profileImage,
+            },
             message: "Profile updated successfully!"
         });
 

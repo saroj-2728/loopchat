@@ -2,8 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import userInfoRoute from './routes/userInfoRoute.js';
 import usersDataRoute from './routes/usersDataRoute.js';
-import profileSetUpRoute from './routes/profileSetUpRoute.js'
-import profileUpdateRoute from './routes/profileUpdateRoute.js'
+import profileControlRoute from './routes/profileControlRoute.js'
 import messageRoute from './routes/messageRoute.js'
 import dotenv from 'dotenv';
 import './cloudinary/cloudinaryConfig.js';
@@ -20,8 +19,7 @@ app
 
 app.use('/api/user', userInfoRoute);
 app.use('/api', usersDataRoute)
-app.use('/api', profileSetUpRoute)
-app.use('/api', profileUpdateRoute)
+app.use('/api', profileControlRoute)
 app.use('/api', messageRoute)
 
 app.get('/', (req, res) => {

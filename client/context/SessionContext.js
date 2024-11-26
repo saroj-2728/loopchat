@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import auth from '@/Firebase';
 import Cookies from 'js-cookie';
 import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, getAdditionalUserInfo, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { useRouter } from 'next/navigation';
 
 const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
@@ -10,82 +11,118 @@ const githubProvider = new GithubAuthProvider();
 const SessionContext = createContext();
 
 export const SessionProvider = ({ children }) => {
+
+  const router = useRouter()
+
   const [profile, setProfile] = useState(null);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [profileCreated, setProfileCreated] = useState(false)
+
+  const debounce = (func, delay) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), delay);
+    };
+  };
+
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+
+    const debouncedAuthHandler = debounce((currentUser) => {
       if (currentUser) {
-        setUser((prevUser) => {
-          if (prevUser?.uid !== currentUser?.uid) {
-            Cookies.set('userStatus', btoa(currentUser.uid), {
-              secure: true,
-              sameSite: 'strict',
-            });
-            return currentUser;
-          }
-          return prevUser;
-        });
+        Cookies.set('userStatus', btoa(currentUser.uid), { secure: true, sameSite: 'strict' });
+        setUser(currentUser);
       } else {
         Cookies.remove('userStatus');
         setUser(null);
-        setProfile(null)
+        setProfile(null);
       }
-      setLoading(false);
-    });
+    }, 300);
 
-    return () => unsubscribe();
+    const unsubscribe = onAuthStateChanged(auth, debouncedAuthHandler);
+
+    return () => {
+      unsubscribe(); 
+    };
   }, []);
 
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        if (!user?.uid) return;
-
-        setLoading(true);
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/get-user`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-uid': user.uid,
-            },
-          }
-        );
-
-        const result = await response.json();
-        if (result.success) {
-          setProfile(result.userData);
-        } else {
-          setProfile(null)
-          console.error('Profile fetch failed. Signing out...');
-          await signOut(auth);
+  const fetchProfile = async () => {
+    try {
+      if (!user?.uid) {
+        console.error('User not set. Skipping profile fetch.');
+        return {
+          success: false,
+          message: "User not found!"
         }
-      } catch (err) {
-        setProfile(null)
-        console.error('Error fetching profile:', err);
-        await signOut(auth);
-      } finally {
-        setLoading(false);
-        setProfileCreated(false)
       }
-    };
-    if (user?.uid && profileCreated)
-      fetchProfile();
-  }, [user?.uid, profileCreated]);
 
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/get-user`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-uid': user.uid,
+          },
+        }
+      );
+      const result = await response.json();
+
+      if (result.success) {
+        setProfile(result.userData);
+        return {
+          success: true,
+          message: result.message
+        }
+      }
+      else {
+        setProfile(null)
+        console.error('Profile fetch failed. Signing out...');
+        handleSignOut()
+        return {
+          success: false,
+          message: result.message
+        }
+      }
+    }
+    catch (err) {
+      setProfile(null)
+      console.error('Error fetching profile:', err);
+      handleSignOut()
+      return {
+        success: false,
+        message: "Profile fetch failed!!"
+      }
+    }
+  };
 
   useEffect(() => {
-    const userStatus = Cookies.get('userStatus')
-    if (userStatus)
-      setProfileCreated(true)
-  }, [])
+    const userStatus = Cookies.get('userStatus');
+    if (userStatus) {
+      const fetchUserProfile = async () => {
+        if (!user) return;
+        const profileFetchResult = await fetchProfile();
+        if (!profileFetchResult.success) {
+          handleSignOut();
+        }
+      };
+      fetchUserProfile();
+    }
+  }, [user?.uid]);
 
-
+  const handleSignOut = async () => {
+    try {
+      setUser(null);
+      setProfile(null);
+      Cookies.remove('userStatus');
+      await signOut(auth);
+      router.push('/')
+    }
+    catch (error) {
+      console.error("Error during sign out:", error);
+    }
+  };
 
   // Firebase Sign Up and Sign In Methods
 
@@ -113,21 +150,22 @@ export const SessionProvider = ({ children }) => {
           const result = await response.json()
 
           if (result.success) {
-            setProfileCreated(true)
+            setProfile(result.userData)
             return {
               success: true,
               message: result.message
             }
           }
           else {
-            await signOut(auth);
+            handleSignOut()
             return {
               success: false,
               message: result.message
             }
           }
-        } catch (err) {
-          await signOut(auth);
+        }
+        catch (err) {
+          handleSignOut()
           console.error("Error creating user: ", err)
           return {
             success: false,
@@ -135,16 +173,13 @@ export const SessionProvider = ({ children }) => {
           }
         }
       }
-
-      setProfileCreated(true)
-
       return {
         success: true,
-        message: "Signed In With Google"
+        message: "Signed In With Google !"
       }
-
-    } catch (error) {
-      await signOut(auth);
+    }
+    catch (error) {
+      handleSignOut()
       console.error("Error signing in with Google:", error.message);
       return {
         success: false,
@@ -158,11 +193,14 @@ export const SessionProvider = ({ children }) => {
       const result = await signInWithPopup(auth, githubProvider);
       const user = result.user;
       const additionalUserInfo = getAdditionalUserInfo(result);
+
       if (additionalUserInfo.isNewUser) {
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/create-user`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json"
+            },
             body: JSON.stringify({
               uid: user.uid,
               email: user.email,
@@ -176,21 +214,22 @@ export const SessionProvider = ({ children }) => {
           const result = await response.json()
 
           if (result.success) {
-            setProfileCreated(true)
+            setProfile(result.userData)
             return {
               success: true,
               message: result.message
             }
           }
           else {
-            await signOut(auth);
+            handleSignOut()
             return {
               success: false,
               message: result.message
             }
           }
-        } catch (err) {
-          await signOut(auth);
+        }
+        catch (err) {
+          handleSignOut()
           console.error("Error creating user: ", err)
           return {
             success: false,
@@ -198,16 +237,13 @@ export const SessionProvider = ({ children }) => {
           }
         }
       }
-
-      setProfileCreated(true)
-
       return {
         success: true,
-        message: "Signed In With Github"
+        message: "Signed In With GitHub !"
       }
-
-    } catch (error) {
-      await signOut(auth)
+    }
+    catch (error) {
+      handleSignOut()
       console.error("Error signing in with GitHub:", error.message);
       return {
         success: false,
@@ -237,38 +273,46 @@ export const SessionProvider = ({ children }) => {
         const result = await response.json()
 
         if (result.success) {
-          setProfileCreated(true)
+          setProfile(result.userData)
           return {
             success: true,
             message: result.message
           }
         }
         else {
-          await signOut(auth);
+          handleSignOut()
           return {
             success: false,
             message: result.message
           }
         }
 
-      } catch (err) {
-        await signOut(auth);
+      }
+      catch (err) {
         console.error("Error creating user: ", err)
-        await signOut(auth);
+        handleSignOut()
         return {
           success: false,
           message: "Error Signing Up With Email!"
         }
       }
-    } catch (error) {
-      await signOut(auth);
+    }
+    catch (error) {
+      handleSignOut()
       console.error("Error signing up with email:", error.message);
       if (error.code === 'auth/email-already-in-use') {
         return {
           success: false,
           message: "Email Address Is Already In Use!"
         }
-      } else {
+      }
+      else if (error.code === "auth/network-request-failed") {
+        return {
+          success: false,
+          message: "Network Error. Please try again after reconnecting.",
+        };
+      }
+      else {
         return {
           success: false,
           message: "Error Signing Up With Email!"
@@ -277,23 +321,39 @@ export const SessionProvider = ({ children }) => {
     }
   };
 
-  const signInWithEmail = async (email, password) => {
+  const signInWithEmail = async (credentials) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-
-      setProfileCreated(true)
-
+      const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
       return {
         success: true,
-        message: "Signed In With Email"
+        message: "Signed In Successfully !"
       }
-
-    } catch (error) {
-      if (error.code === 'auth/invalid-value-(email),-starting-an-object-on-a-scalar-field') {
+    }
+    catch (error) {
+      console.error(error);
+      if (error.code === 'auth/user-not-found') {
         return {
           success: false,
-          message: "Invalid Email Address!"
+          message: "No account found with the provided email address. !"
         }
+      }
+      else if (error.code === "auth/wrong-password") {
+        return {
+          success: false,
+          message: "Incorrect password. Please try again.",
+        };
+      }
+      else if (error.code === "auth/invalid-credential") {
+        return {
+          success: false,
+          message: "Incorrect credentials. Please try again.",
+        };
+      }
+      else if (error.code === "auth/network-request-failed") {
+        return {
+          success: false,
+          message: "Network Error. Please try again after reconnecting.",
+        };
       }
       else {
         console.error("Error signing in with email:", error.message);
@@ -307,7 +367,18 @@ export const SessionProvider = ({ children }) => {
 
 
   return (
-    <SessionContext.Provider value={{ user, profile, setProfile, loading, signInWithEmail, signUpWithEmail, signInWithGithub, signInWithGoogle }}>
+    <SessionContext.Provider
+      value={{
+        user,
+        profile,
+        setProfile,
+        signInWithEmail,
+        signUpWithEmail,
+        signInWithGithub,
+        signInWithGoogle,
+        handleSignOut,
+      }}
+    >
       {children}
     </SessionContext.Provider>
   );

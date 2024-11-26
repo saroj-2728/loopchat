@@ -42,6 +42,13 @@ export const handleUserCreation = async (req, res) => {
 
         let user = await User.findOne({ username })
         if (user) {
+            try {
+                await admin.auth().deleteUser(uid);
+                console.log(`User with UID: ${uid} deleted from Firebase.`);
+            } 
+            catch (err) {
+                console.error("Error deleting Firebase user:", err);
+            }
             return res.status(401).json({
                 success: false,
                 message: "User with this username already exists!"
@@ -55,7 +62,9 @@ export const handleUserCreation = async (req, res) => {
             email,
             provider,
             emailVerified,
-            profileImage: { url: photoURL || null, public_id: null }
+            profileImage: {
+                url: photoURL || null, public_id: null
+            }
         })
         await newUser.save()
 
@@ -63,6 +72,7 @@ export const handleUserCreation = async (req, res) => {
 
         return res.status(200).json({
             success: true,
+            userData: newUser,
             message: "User created successfully!"
         });
     }

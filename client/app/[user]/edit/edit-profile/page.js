@@ -8,12 +8,14 @@ import DefaultProfile from "@/utilities/DefaultProfile";
 import { usePopup } from "@/context/PopupContext";
 import Loader from "@/components/Loader";
 import { useSession } from "@/context/SessionContext";
+import auth from "@/Firebase";
 
 const ProfileEdit = () => {
 
-    const { profile } = useSession()
+    const { profile, setProfile } = useSession()
     const router = useRouter()
     const { showPopup } = usePopup()
+    const currentUser = auth.currentUser;
 
     const [profileImage, setProfileImage] = useState(null);
     const [errorMessage, setErrorMessage] = useState("")
@@ -27,36 +29,46 @@ const ProfileEdit = () => {
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
     const onSubmit = async (formData) => {
-
+        setErrorMessage("")
         setLoading(true)
+
         const updatedData = new FormData();
+        updatedData.append("uid", profile?.uid);
         updatedData.append("name", formData.name);
         updatedData.append("username", formData.username);
-        updatedData.append("email", formData.email);
         updatedData.append("bio", formData.bio);
         if (profileImage) {
             updatedData.append("profileImage", profileImage);
             updatedData.append("previousPublicId", profile.profileImage?.public_id);
         }
 
-        // try {
-        //     const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/${profile.username}/update-profile`, {
-        //         method: "PUT",
-        //         body: updatedData,
-        //     });
-        //     const result = await response.json()
-        //     if (result.success) {
-        //         setUser(result.userData);
-        //         showPopup("Profile Updated Successfully !")
-        //         router.push(`/${result.userData?.username}`)
-        //     } else {
-        //         setLoading(false)
-        //         setErrorMessage(result.message);
-        //         showPopup("Profile Updation Failed !", "red")
-        //     }
-        // } catch (error) {
-        //     console.error("Error updating profile:", error);
-        // }
+        try {
+            const token = await currentUser.getIdToken()
+            const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/update-profile`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                body: updatedData,
+            });
+            const result = await response.json()
+            if (result.success) {
+                showPopup("Profile Updated Successfully !")
+                setProfile(prevData => {
+                    return {
+                        ...prevData,
+                        ...result.updatedData
+                    }
+                })
+                router.push(`/${result.userData?.username}`)
+            } else {
+                setLoading(false)
+                setErrorMessage(result.message);
+                showPopup("Profile Updation Failed !", "red")
+            }
+        } catch (error) {
+            console.error("Error updating profile:", error);
+        }
     };
 
     const handleImageChange = (event) => {
@@ -143,9 +155,10 @@ const ProfileEdit = () => {
                                 {...register("username", {
                                     required: "Username is required",
                                     minLength: { value: 3, message: "Username must be at least 3 characters long!" },
-                                    validate: {
-                                        noSpaces: value => !/\s/g.test(value) || 'No spaces allowed in username',
-                                        isLowercase: value => value === value.toLowerCase() || 'Username must be lowercase only'
+                                    maxLength: { value: 20, message: "Username cannot exceed 20 characters!" },
+                                    pattern: {
+                                        value: /^[a-z0-9-]+$/,
+                                        message: "Username can only contain lowercase letters, numbers, and dashes (-).",
                                     },
                                 })}
                                 className="w-full px-4 py-3 text-sm md:text-lg bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
@@ -157,15 +170,19 @@ const ProfileEdit = () => {
 
                         <div className="flex flex-col gap-3">
                             <label className="block font-bold md:text-xl">Email</label>
-                            <input
-                                type="email"
-                                placeholder="Email"
-                                {...register("email", { required: false })}
-                                className="w-full px-4 py-3 text-sm md:text-lg bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
-                            />
-                            {errors.email &&
-                                <p className="text-red-500 text-sm md:text-base">{errors.email.message}</p>
-                            }
+                            <div className="w-full relative group">
+                                <input
+                                    type="email"
+                                    disabled
+                                    value={profile?.email || ""}
+                                    placeholder="Email"
+                                    className="w-full px-4 py-3 text-sm md:text-lg bg-transparent disabled:bg-gray-950 disabled:text-gray-400 rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
+                                />
+                                <div
+                                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-3 md:px-4 py-2 md:py-3 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    Email cannot be changed.
+                                </div>
+                            </div>
                         </div>
 
                         <div className="flex flex-col gap-3">
@@ -214,13 +231,13 @@ const ProfileEdit = () => {
                             <Link
                                 href={`/${profile?.username}/edit/change-password`}
                                 className="text-sky-500"
-                                >
+                            >
                                 Change Password
                             </Link>
                             <Link
                                 href={`/${profile?.username}/edit/delete-profile`}
                                 className="text-sky-500"
-                                >
+                            >
                                 Delete Profile
                             </Link>
                         </div>
