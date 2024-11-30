@@ -4,12 +4,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { useSession } from "@/context/SessionContext"
 import { useFriends } from "@/context/FriendContext";
-import Loader from "@/components/Loader";
+import Loader from "./Loader";
 import DefaultProfile from "@/utilities/DefaultProfile";
 import { usePopup } from "@/context/PopupContext";
 import { RxCross1 } from "react-icons/rx";
 
-const Notifications = () => {
+const Notifications = ({ notificationsVisible, setNotificationsVisible }) => {
 
     const { profile } = useSession()
     const { pendingRequests, notifications, setNotifications } = useFriends()
@@ -96,21 +96,25 @@ const Notifications = () => {
         }
     }
 
+    if (!notificationsVisible) return null;
+
     return (
         <>
-            <div className="w-full min-h-screen flex flex-col items-center text-white mb-20">
+            <section
+                className={`notifications hidden md:block absolute left-full top-0 w-[300%] md:w-[500%]  max-w-md h-full transition-all duration-300 bg-black border-r border-r-white/20`}
+            >
+                <div className="shadow-small rounded-lg p-4 md:px-0 w-full max-w-md mx-auto text-center h-full flex flex-col bg-black/30 backdrop-blur-md ">
+
+                    <div className="flex items-center">
+                        <h1 className="text-base md:w-full w-[85%] md:text-2xl font-bold text-center text-white">
+                            Notifications
+                        </h1>
+                    </div>
+
+                    <div className="users w-full mt-2 md:mt-4  overflow-y-auto flex flex-col flex-grow">
 
 
-                <div className="w-full">
-                    <h1 className="text-3xl md:text-4xl text-center font-bold mt-7 mb-2">
-                        Notifications
-                    </h1>
-                </div>
-
-                <div className="w-full max-w-xl flex flex-col md:flex-row items-center gap-4 px-4 md:px-0 bg-black py-4 sticky top-0">
-
-                    <div className="w-full px-4 md:px-0 max-w-xl mt-2 md:mt-4 flex flex-col items-center">
-                        <div className="w-full">
+                        <div>
                             {
                                 notifications?.length > 0 ?
                                     notifications.map((notification, index) => {
@@ -119,11 +123,11 @@ const Notifications = () => {
                                                 className="w-full flex flex-row items-center justify-between py-5 px-7 border-y border-white/10"
                                                 key={index}
                                             >
-                                                <p className="w-full">
+                                                <p>
                                                     {notification?.responseFrom?.name} {notification?.response} your friend request.
                                                 </p>
                                                 <RxCross1
-                                                    className="p-1 hover:bg-gray-600 box-content rounded-full cursor-pointer"
+                                                className="p-1 hover:bg-gray-600 box-content rounded-full cursor-pointer"
                                                     onClick={() => handleNotificationsDeletion(notification?.responseFrom?._id)}
                                                 />
                                             </div>
@@ -131,7 +135,7 @@ const Notifications = () => {
                                     })
                                     :
                                     (
-                                        <div className="text-center">No new notifications</div>     
+                                        "No new notifications"
                                     )
                             }
                         </div>
@@ -217,7 +221,7 @@ const Notifications = () => {
                             )}
                     </div>
                 </div>
-            </div>
+            </section>
         </>
     )
 }

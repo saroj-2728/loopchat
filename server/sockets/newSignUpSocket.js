@@ -1,6 +1,6 @@
 import { getSocketInstance } from "../socket.js";
 
-export const newUserSignUpSocket = () => {
+export const usersChangeSocket = () => {
     const io = getSocketInstance()
     io.emit("newUserSignUp")
 }

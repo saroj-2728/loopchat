@@ -1,12 +1,12 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import AllUsersProvider from "@/context/allUsersContext";
 import { SocketProvider } from "@/context/socketContext";
 import { PopupProvider } from "@/context/PopupContext";
 import Popup from "@/components/Popup";
 import { SessionProvider } from "@/context/SessionContext";
 import GithubRepo from "@/components/GithubRepo";
+import { FriendsProvider } from "@/context/FriendContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,12 +35,12 @@ export default function RootLayout({ children }) {
           <Popup />
           <SessionProvider>
             <SocketProvider>
-              <AllUsersProvider>
-                <div className="md:flex flex-row">
-                  <Navbar />
-                  {children}
-                </div>
-              </AllUsersProvider>
+                <FriendsProvider>
+                  <div className="md:flex flex-row">
+                    <Navbar />
+                    {children}
+                  </div>
+                </FriendsProvider>
             </SocketProvider>
           </SessionProvider>
         </PopupProvider>

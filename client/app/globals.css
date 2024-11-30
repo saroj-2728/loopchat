@@ -26,15 +26,28 @@ body {
   }
 }
 
-/* Hide Scrollbar in the entire website */
+/* Scrollbar for Firefox */
 * {
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* Internet Explorer 10+ */
+  scrollbar-width: thin;
+  scrollbar-color: #0e1b24 #000;
 }
 
+/* Webkit-based browsers (Chrome, Edge, Safari) */
 *::-webkit-scrollbar {
-  display: none;
-  /* Safari and Chrome */
+  width: 3px;
+  height: 3px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #0e1b24;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #254c68;
+  width: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #000;
 }

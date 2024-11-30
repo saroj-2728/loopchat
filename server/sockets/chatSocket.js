@@ -24,10 +24,6 @@ const handlePrivateMessage = async (socket, { senderId, receiverId, content, tim
     }
 };
 
-export const handleNewUserSignUp = (socket) => {
-    socket.emit("newUserSignUp", {});
-};
-
 const disconnectUser = (socket) => {
     for (const userId in connectedUsers) {
         if (connectedUsers[userId] === socket.id) {
@@ -43,8 +39,6 @@ export const initChatSocket = async () => {
     io.on("connection", (socket) => {
         // console.log(`User connected: ${socket.id}`);
         socket.on("privateMessage", (msgData) => handlePrivateMessage(socket, msgData));
-
-        socket.on("newUserSignUp", () => handleNewUserSignUp(socket));
 
         socket.on("disconnect", () => disconnectUser(socket));
     });

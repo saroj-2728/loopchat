@@ -1,8 +1,6 @@
 "use client"
-import React, { useEffect, useState, useRef, useContext } from 'react'
-import { AllUsersContext } from '@/context/allUsersContext';
+import { useEffect, useState, useRef, use } from 'react'
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import { useSocket } from '@/context/socketContext';
 import Loader from '@/components/Loader';
@@ -10,13 +8,15 @@ import DefaultProfile from '@/utilities/DefaultProfile';
 import { GoArrowLeft } from "react-icons/go";
 import { useSession } from '@/context/SessionContext';
 import auth from '@/Firebase';
+import { useFriends } from '@/context/FriendContext';
 
 const MessagePage = ({ params }) => {
 
   const { profile } = useSession()
   const currentUser = auth.currentUser;
+  const unwrappedParams = use(params);
 
-  const { allUsers } = useContext(AllUsersContext)
+  const { friends } = useFriends()
   const router = useRouter()
 
   const socketRef = useSocket()
@@ -25,6 +25,7 @@ const MessagePage = ({ params }) => {
   const [targetUser, settargetUser] = useState({});
   const [inputMessage, setInputMessage] = useState("")
   const [messages, setMessages] = useState([])
+  const [fetchingMessages, setFetchingMessages] = useState(true)
 
   const defaultProfileSrc = DefaultProfile()
 
@@ -33,22 +34,22 @@ const MessagePage = ({ params }) => {
   };
 
   useEffect(() => {
-    if (allUsers.length === 0) return;
+    if (friends.length === 0) return;
     const fetchUsersName = () => {
-      const theUser = allUsers.find((user) => user.username === params.slug)
+      const theUser = friends.find((user) => user.username === unwrappedParams.slug)
       if (theUser)
         settargetUser(theUser)
       else
         router.push(`/messages`)
     };
     fetchUsersName();
-  }, [allUsers, params.slug, router]);
+  }, [friends, unwrappedParams.slug, router]);
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const token = await currentUser.getIdToken()
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/messages/${profile.username}/${targetUser.username}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/messages/${profile._id}/${targetUser._id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -59,6 +60,7 @@ const MessagePage = ({ params }) => {
 
         if (response.ok) {
           setMessages(result);
+          setFetchingMessages(false)
         } else {
           console.error('Failed to fetch messages:', result.error);
         }
@@ -82,7 +84,7 @@ const MessagePage = ({ params }) => {
 
     // Listen for incoming messages 
     socket?.on('privateMessage', (data) => {
-      if (data.senderId === targetUser.username && profile.username === data.receiverId) {
+      if (data.senderId === targetUser._id && profile._id === data.receiverId) {
         setMessages((prevMessages) => [
           ...prevMessages,
           data,
@@ -111,15 +113,15 @@ const MessagePage = ({ params }) => {
     setMessages((prevMessages) => [
       ...prevMessages,
       {
-        senderId: profile.username,
-        receiverId: targetUser.username,
+        senderId: profile._id,
+        receiverId: targetUser._id,
         content: inputMessage,
       },
     ]);
 
     socketRef.current.emit('privateMessage', {
-      senderId: profile.username,
-      receiverId: targetUser.username,
+      senderId: profile._id,
+      receiverId: targetUser._id,
       content: inputMessage,
       timestamp: new Date().toISOString(),
     });
@@ -129,15 +131,14 @@ const MessagePage = ({ params }) => {
   return (
     <div className='relative h-full w-full flex flex-col'>
 
-      <div className="messageTo w-full flex flex-row items-center justify-start gap-3 text-center text-white font-medium text-base md:text-xl border-b border-white/20 py-2 md:py-4 px-4">
-
-        <Link
-          href={'/messages'}
+      <div className="messageTo w-full flex flex-row items-center justify-start gap-3 text-center text-white font-medium text-base md:text-xl border-b border-white/20 py-2 md:py-2.5 px-4">
+        <div
+          onClick={() => router.back()}
           className="md:hidden"
         >
           <GoArrowLeft className=" w-7 h-7" />
-        </Link>
-        <div className='flex justify-center w-[30px] h-[30px] md:w-[50px] md:h-[50px]'>
+        </div>
+        <div className='flex justify-center w-[30px] h-[30px] md:w-[45px] md:h-[45px]'>
           <Image
             src={targetUser?.profileImage?.url || defaultProfileSrc}
             width={50}
@@ -146,9 +147,11 @@ const MessagePage = ({ params }) => {
             className="rounded-full"
           />
         </div>
-        {targetUser.name ? targetUser.name
-          :
-          <Loader size={'h-8 w-8'} text={''} />}
+        <p className='text-base'>
+          {targetUser.name ? targetUser.name
+            :
+            <Loader size={'h-8 w-8'} text={''} />}
+        </p>
       </div>
 
       <div ref={ref} className="messageSection w-full overflow-auto flex-grow rounded-lg px-4 md:px-6">
@@ -156,12 +159,12 @@ const MessagePage = ({ params }) => {
           messages.map((msgObj, index) => (
             <div
               key={index}
-              className={`flex flex-row w-full ${msgObj.senderId === profile?.username ? "justify-end" : "justify-start"} items-center gap-2 md:gap-3 my-5`}
+              className={`flex flex-row w-full ${msgObj.senderId === profile?._id ? "justify-end" : "justify-start"} items-center gap-2 md:gap-3 my-5 md:my-3`}
             >
-              {msgObj.senderId !== profile?.username &&
+              {msgObj.senderId !== profile?._id &&
                 <div className='flex justify-center w-[30px] h-[30px] md:h-[38px] md:w-[38px]'>
                   <Image
-                    src={targetUser?.profileImage?.url}
+                    src={targetUser?.profileImage?.url || defaultProfileSrc}
                     height={40}
                     width={40}
                     alt="User's Profile"
@@ -169,15 +172,16 @@ const MessagePage = ({ params }) => {
                   />
                 </div>
               }
-              <span className={`rounded-xl md:py-2 py-1 px-4 md:px-5 text-lg ${msgObj.senderId === profile?.username ? "bg-sky-500 rounded-br" : "bg-gray-600/50 rounded-bl"} text-white max-w-[50%]`}>
+              <span className={`rounded-xl md:py-1.5 py-1 px-4 md:px-5 text-lg md:text-base ${msgObj.senderId === profile?._id ? "bg-sky-500 rounded-br" : "bg-gray-600/50 rounded-bl"} text-white max-w-[50%]`}>
                 {msgObj.content}
               </span>
             </div>
           ))
         )
           :
-          (
-            <p className="text-gray-200 text-center mt-4">No messages yet.</p>
+          (fetchingMessages
+            ? <Loader size={'h-8 w-8'} text={''} />
+            : <p className="text-gray-200 text-center mt-4">No messages yet.</p>
           )}
         <div ref={endOfMessagesRef} />
       </div>
@@ -190,15 +194,29 @@ const MessagePage = ({ params }) => {
             type="text"
             value={inputMessage}
             placeholder='Message...'
-            onKeyDown={(e) => { if (e.key === "Enter") handleMessageSent(); }}
+            onKeyDown={(e) => {
+              if (inputMessage.length > 400) return;
+              if (e.key === "Enter") handleMessageSent();
+            }}
             onChange={(e) => setInputMessage(e.target.value)}
             className='py-3 md:py-[14px] pl-6 pr-24 w-full text-sm md:text-lg box-border rounded-full border border-gray-200/30 text-white bg-transparent placeholder-white/50'
           />
-          {inputMessage && <button
-            onClick={handleMessageSent}
-            className='absolute top-1/2 right-4 transform -translate-y-1/2 hover:text-white text-sky-500 font-semibold py-2 px-4 rounded-full transition duration-300'>
-            Send
-          </button>}
+
+          {inputMessage.length > 400 && (
+            <div className="absolute text-center bottom-12 md:bottom-14 left-1/2 transform -translate-x-1/2 text-red-500 text-sm">
+              Message is too long (max 400 characters)
+            </div>
+          )}
+
+          {inputMessage &&
+            <button
+              disabled={inputMessage.length > 400}
+              onClick={handleMessageSent}
+              className={`absolute top-1/2 right-4 transform -translate-y-1/2 text-sky-500 font-semibold py-2 px-4 rounded-full transition duration-300  ${inputMessage.length > 400 ? 'text-white/20 cursor-not-allowed' : 'hover:text-white'}`}
+            >
+              Send
+            </button>
+          }
         </div>
       </div>
     </div>

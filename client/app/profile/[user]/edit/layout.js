@@ -23,20 +23,20 @@ export default function RootLayout({ children }) {
                     </h1>
                     <div className="flex flex-col w-full px-5 gap-3">
                         <Link
-                            href={`/${profile?.username}/edit/edit-profile`}
-                            className={`${pathname.includes('edit-profile') ? "bg-accent/80" : ""} hover:bg-accent py-4 rounded-lg px-4 transition duration-300 font-medium`}
+                            href={`/profile/${profile?.username}/edit/edit-profile`}
+                            className={`${pathname.includes('edit-profile') ? "bg-accent/80" : ""} hover:bg-accent py-4 rounded-lg px-4 transition duration-300 font-medium text-sm`}
                         >
                             Edit Profile
                         </Link>
                         <Link
-                            href={`/${profile?.username}/edit/change-password`}
-                            className={`${pathname.includes('change-password') ? "bg-accent/80" : ""} hover:bg-accent py-4 rounded-lg px-4  transition duration-300 font-medium`}
+                            href={`/profile/${profile?.username}/edit/change-password`}
+                            className={`${pathname.includes('change-password') ? "bg-accent/80" : ""} hover:bg-accent py-4 rounded-lg px-4  transition duration-300 font-medium text-sm`}
                         >
                             Change Password
                         </Link>
                         <Link
-                            href={`/${profile?.username}/edit/delete-profile`}
-                            className={`${pathname.includes('delete-profile') ? "bg-accent/80" : ""} hover:bg-accent py-4 rounded-lg px-4  transition duration-300 font-medium`}
+                            href={`/profile/${profile?.username}/edit/delete-profile`}
+                            className={`${pathname.includes('delete-profile') ? "bg-accent/80" : ""} hover:bg-accent py-4 rounded-lg px-4  transition duration-300 font-medium text-sm`}
                         >
                             Delete Profile
                         </Link>

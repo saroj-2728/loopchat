@@ -37,7 +37,7 @@ export const SessionProvider = ({ children }) => {
         setUser(null);
         setProfile(null);
       }
-    }, 300);
+    }, 500);
 
     const unsubscribe = onAuthStateChanged(auth, debouncedAuthHandler);
 
@@ -330,7 +330,6 @@ export const SessionProvider = ({ children }) => {
       }
     }
     catch (error) {
-      console.error(error);
       if (error.code === 'auth/user-not-found') {
         return {
           success: false,

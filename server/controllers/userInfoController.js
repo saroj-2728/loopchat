@@ -2,15 +2,21 @@ import connectToDatabase from "../lib/mongodb.js";
 import mongoose from "mongoose";
 import admin from '../firebaseConfig.js'
 import { User } from "../models/User.js"
-import { newUserSignUpSocket } from "../sockets/newSignUpSocket.js";
+import { usersChangeSocket } from "../sockets/newSignUpSocket.js";
 
 export const handleGetUser = async (req, res) => {
     const uid = req.headers['x-uid'];
+    const username = req.headers['x-username'];
 
     try {
         await connectToDatabase();
 
-        let user = await User.findOne({ uid })
+        const user = await User.findOne({
+            $or: [
+                { uid: uid || null },
+                { username: username || null }
+            ]
+        })
 
         if (!user) {
             return res.status(404).json({
@@ -45,7 +51,7 @@ export const handleUserCreation = async (req, res) => {
             try {
                 await admin.auth().deleteUser(uid);
                 console.log(`User with UID: ${uid} deleted from Firebase.`);
-            } 
+            }
             catch (err) {
                 console.error("Error deleting Firebase user:", err);
             }
@@ -68,7 +74,7 @@ export const handleUserCreation = async (req, res) => {
         })
         await newUser.save()
 
-        newUserSignUpSocket()
+        usersChangeSocket()
 
         return res.status(200).json({
             success: true,

@@ -47,7 +47,7 @@ const DeleteProfile = () => {
             const result = await response.json()
 
             if (result.success) {
-                showPopup("Profile Deleted Successfully !")
+                showPopup("Profile deleted successfully !")
                 handleSignOut()
                 setProfile(null)
                 router.push(`/`)
@@ -55,7 +55,7 @@ const DeleteProfile = () => {
             else {
                 setLoading(false)
                 setErrorMessage(result.message);
-                showPopup("Profile Deletion Failed !", "red")
+                showPopup("Profile deletion failed !", "red")
             }
         }
         catch (err) {
@@ -77,18 +77,18 @@ const DeleteProfile = () => {
             {isLoading ? (
                 <Loader size="h-16 w-16" text="Deleting your account, please wait..." />
             ) : (
-                <div className="max-w-[600px] w-full p-4 md:p-8 rounded-lg shadow-lg">
-                    <h1 className="text-xl md:text-3xl text-center font-semibold my-6">
+                <div className="max-w-xl w-full p-4 md:p-8 rounded-lg shadow-lg">
+                    <h1 className="text-3xl md:text-2xl text-center font-semibold my-6">
                         Delete Profile
                     </h1>
-                    <p className="md:text-xl text-center my-3">
+                    <p className="text-center my-3">
                         Are you sure you want to delete your account? This action cannot be reversed.
                     </p>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                         {profile?.provider === "password" &&
                             <>
                                 <div className="flex flex-col gap-3">
-                                    <label className="block font-bold md:text-xl">Email</label>
+                                    <label className="block font-bold">Email</label>
                                     <input
                                         placeholder="Email"
                                         type="email"
@@ -101,7 +101,7 @@ const DeleteProfile = () => {
                                                 message: 'Please enter a valid email address',
                                             },
                                         })}
-                                        className="w-full px-4 py-3 text-sm md:text-lg bg-transparent rounded-xl border border-gray-700 focus:outline-none  focus:border-red-500"
+                                        className="w-full px-4 py-3 text-sm bg-transparent rounded-xl border border-gray-700 focus:outline-none  focus:border-red-500"
                                     />
                                     {errors.email && (
                                         <p className="text-red-500 text-sm md:text-base">{errors.email.message}</p>
@@ -109,7 +109,7 @@ const DeleteProfile = () => {
                                 </div>
 
                                 <div className="flex flex-col gap-3">
-                                    <label className="block font-bold md:text-xl">Password</label>
+                                    <label className="block font-bold">Password</label>
                                     <div className='relative w-full'>
                                         <input
                                             placeholder="Password"
@@ -120,7 +120,7 @@ const DeleteProfile = () => {
                                                     : false,
                                                 minLength: { value: 8, message: "Password must be at least 8 characters long!" },
                                             })}
-                                            className="w-full px-4 py-3 text-sm md:text-lg bg-transparent rounded-xl border border-gray-700 focus:outline-none  focus:border-red-500"
+                                            className="w-full px-4 py-3 text-sm bg-transparent rounded-xl border border-gray-700 focus:outline-none  focus:border-red-500"
                                         />
                                         <FaEye
                                             onClick={() => setPasswordVisible(!passwordVisible)}
@@ -146,13 +146,13 @@ const DeleteProfile = () => {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition duration-300"
+                                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 md:py-2.5 rounded-lg transition duration-300"
                             >
                                 Delete Profile
                             </button>
                             <Link
-                                href={`/${profile?.username}`}
-                                className="w-full text-white text-center font-medium bg-button-secondary hover:bg-button-secondary/90 px-3 md:px-4 py-3 rounded-lg transition duration-300"
+                                href={`/profile/${profile?.username}`}
+                                className="w-full text-white text-center font-medium bg-button-secondary hover:bg-button-secondary/90 px-3 md:px-4 py-3 md:py-2.5 rounded-lg transition duration-300"
                             >
                                 Cancel
                             </Link>

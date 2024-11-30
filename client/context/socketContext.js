@@ -13,16 +13,16 @@ export const SocketProvider = ({ children }) => {
     const { profile } = useSession()
     const socketRef = useRef(null)
     useEffect(() => {
-        if (!profile?.username) return;
+        if (!profile?._id) return;
 
         const socket = io(process.env.NEXT_PUBLIC_SERVER_URL);
         socketRef.current = socket;
-        socketRef.current.emit("register", profile.username)
+        socketRef.current.emit("register", profile?._id)
 
         return () => {
             socket.disconnect()
         }
-    }, [profile])
+    }, [profile?._id])
 
     return (
         <SocketContext.Provider value={socketRef}>

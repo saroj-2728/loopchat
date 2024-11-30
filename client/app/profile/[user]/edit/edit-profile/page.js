@@ -53,18 +53,18 @@ const ProfileEdit = () => {
             });
             const result = await response.json()
             if (result.success) {
-                showPopup("Profile Updated Successfully !")
-                setProfile(prevData => {
+                showPopup("Profile updated successfully !")
+                await setProfile(prevData => {
                     return {
                         ...prevData,
                         ...result.updatedData
                     }
                 })
-                router.push(`/${result.userData?.username}`)
+                router.push(`/profile/${result.updatedData?.username}`)
             } else {
                 setLoading(false)
                 setErrorMessage(result.message);
-                showPopup("Profile Updation Failed !", "red")
+                showPopup("Profile updation failed !", "red")
             }
         } catch (error) {
             console.error("Error updating profile:", error);
@@ -91,16 +91,16 @@ const ProfileEdit = () => {
                 <Loader size={'h-16 w-16'} text={"Please Wait ..."} />
                 :
                 <div className="max-w-[850px] w-full p-1 md:p-4 rounded-lg shadow-lg">
-                    <h1 className="text-xl md:text-3xl text-center font-semibold my-6">
+                    <h1 className="text-3xl md:text-2xl text-center font-semibold my-6">
                         Edit Profile
                     </h1>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="mb-14 rounded-lg p-2 md:p-8 space-y-6">
+                    <form onSubmit={handleSubmit(onSubmit)} className="mb-14 max-w-2xl mx-auto rounded-lg p-2 md:p-8 space-y-6">
 
-                        <div className="w-auto flex justify-between items-center bg-accent rounded-3xl md:px-6 px-3 md:py-1">
+                        <div className="w-auto flex justify-between items-center bg-accent rounded-3xl md:px-6 px-3">
                             <div className="flex flex-row items-center gap-3 md:gap-5">
                                 {imagePreview && (
-                                    <div className="my-4 w-14 md:w-[70px] h-14 md:h-[70px] flex justify-center mx-auto">
+                                    <div className="my-4 w-14 md:w-[58px] h-14 md:h-[58px] flex justify-center mx-auto">
                                         <Image
                                             src={imagePreview}
                                             width={70}
@@ -111,7 +111,7 @@ const ProfileEdit = () => {
                                     </div>
                                 )}
                                 <div className="flex flex-col">
-                                    <span className="text-sm md:text-lg font-bold">{profile?.username}</span>
+                                    <span className="text-sm md:text-base font-bold">{profile?.username}</span>
                                     <span className="text-white/60 text-xs md:text-base">{profile?.name}</span>
                                 </div>
                             </div>
@@ -128,19 +128,19 @@ const ProfileEdit = () => {
                                     onClick={() => {
                                         fileInputRef.current.click();
                                     }}
-                                    className="px-3 md:px-5 py-2 bg-button-primary hover:bg-button-primary/80 rounded-xl text-sm md:text-base font-semibold transition duration-300">
+                                    className="px-3 md:px-5 py-2 bg-button-primary hover:bg-button-primary/80 rounded-xl text-sm md:text-sm font-semibold transition duration-300">
                                     Change Photo
                                 </button>
                             </div>
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <label className="block font-bold md:text-xl">Name</label>
+                            <label className="block font-bold">Name</label>
                             <input
                                 placeholder="Name"
                                 type="text"
                                 {...register("name", { required: "Name is required" })}
-                                className="w-full px-4 py-3 text-sm md:text-lg bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
+                                className="w-full px-4 py-3 text-sm bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
                             />
                             {errors.name &&
                                 <p className="text-red-500 text-sm md:text-base">{errors.name.message}</p>
@@ -148,7 +148,7 @@ const ProfileEdit = () => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <label className="block font-bold md:text-xl">Username</label>
+                            <label className="block font-bold">Username</label>
                             <input
                                 placeholder="Username"
                                 type="text"
@@ -161,7 +161,7 @@ const ProfileEdit = () => {
                                         message: "Username can only contain lowercase letters, numbers, and dashes (-).",
                                     },
                                 })}
-                                className="w-full px-4 py-3 text-sm md:text-lg bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
+                                className="w-full px-4 py-3 text-sm bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
                             />
                             {errors.username &&
                                 <p className="text-red-500 text-sm md:text-base">{errors.username.message}</p>
@@ -169,29 +169,29 @@ const ProfileEdit = () => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <label className="block font-bold md:text-xl">Email</label>
+                            <label className="block font-bold">Email</label>
                             <div className="w-full relative group">
                                 <input
                                     type="email"
                                     disabled
                                     value={profile?.email || ""}
                                     placeholder="Email"
-                                    className="w-full px-4 py-3 text-sm md:text-lg bg-transparent disabled:bg-gray-950 disabled:text-gray-400 rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
+                                    className="w-full px-4 py-3 text-sm bg-transparent disabled:bg-gray-950 disabled:text-gray-400 rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
                                 />
                                 <div
-                                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-3 md:px-4 py-2 md:py-3 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-3 md:px-4 py-2 md:py-3 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                                     Email cannot be changed.
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <label className="block font-bold md:text-xl">Bio</label>
+                            <label className="block font-bold">Bio</label>
                             <textarea
                                 placeholder="Bio"
                                 rows={5}
                                 {...register("bio")}
-                                className="w-full px-4 py-3 text-sm md:text-lg bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
+                                className="w-full px-4 py-3 text-sm bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-sky-500"
                             />
                         </div>
 
@@ -211,13 +211,13 @@ const ProfileEdit = () => {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full  bg-button-primary hover:bg-button-primary/80 text-white font-semibold py-3 rounded-lg transition duration-300"
+                                className="w-full  bg-button-primary hover:bg-button-primary/80 text-white font-semibold py-3 md:py-2.5 rounded-lg transition duration-300"
                             >
                                 Save Changes
                             </button>
                             <Link
-                                href={`/${profile?.username}`}
-                                className="w-full text-white text-center font-medium bg-button-secondary hover:bg-button-secondary/90 px-3 md:px-4 py-3 rounded-lg transition duration-300"
+                                href={`/profile/${profile?.username}`}
+                                className="w-full text-white text-center font-medium bg-button-secondary hover:bg-button-secondary/90 px-3 md:px-4 py-3 md:py-2.5 rounded-lg transition duration-300"
                             >
                                 Cancel
                             </Link>
@@ -229,13 +229,13 @@ const ProfileEdit = () => {
                         <p>Looking for something else ?</p>
                         <div className="w-full mx-auto flex flex-row py-2 justify-center gap-5">
                             <Link
-                                href={`/${profile?.username}/edit/change-password`}
+                                href={`/profile/${profile?.username}/edit/change-password`}
                                 className="text-sky-500"
                             >
                                 Change Password
                             </Link>
                             <Link
-                                href={`/${profile?.username}/edit/delete-profile`}
+                                href={`/profile/${profile?.username}/edit/delete-profile`}
                                 className="text-sky-500"
                             >
                                 Delete Profile

@@ -36,11 +36,11 @@ const ChangePassword = () => {
             await updatePassword(currentUser, formData.newPassword);
 
             showPopup("Password updated successfully!");
-            router.push(`/${profile?.username}`);
+            router.push(`/profile/${profile?.username}`);
         }
         catch (err) {
             console.error(err)
-            showPopup("Password Change Failed !", "red")
+            showPopup("Password change failed !", "red")
             if (err.code === "auth/wrong-password") {
                 setErrorMessage("Incorrect old password. Please try again.");
             }
@@ -59,7 +59,7 @@ const ChangePassword = () => {
     if (profile?.provider !== "password")
         return (
             <div className="min-h-screen w-full flex flex-col items-center justify-center text-white">
-                <div className="md:text-xl text-center">
+                <div className="text-center">
                     Oops! It seems like you signed in using {profile?.provider?.split('.')[0]}. <br />
                     Password management is only available for email and password accounts. <br />
                     To manage your account or update your credentials, please visit your {profile?.provider?.split('.')[0]} account settings.
@@ -72,13 +72,13 @@ const ChangePassword = () => {
             {isLoading ? (
                 <Loader size="h-16 w-16" text="Updating password, please wait..." />
             ) : (
-                <div className="max-w-[600px] w-full p-4 md:p-8 rounded-lg shadow-lg">
-                    <h1 className="text-xl md:text-3xl text-center font-semibold my-6">
+                <div className="max-w-xl w-full p-4 md:p-8 rounded-lg shadow-lg">
+                    <h1 className="text-xl md:text-2xl text-center font-semibold my-6">
                         Change Password
                     </h1>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                         <div className="flex flex-col gap-3">
-                            <label className="block font-bold md:text-xl">Old Password</label>
+                            <label className="block font-bold">Old Password</label>
                             <div className="relative w-full">
                                 <input
                                     type={passwordVisible ? "text" : "password"}
@@ -87,7 +87,7 @@ const ChangePassword = () => {
                                         required: "Old password is required",
                                         minLength: { value: 8, message: "Password must be at least 8 characters long!" },
                                     })}
-                                    className="w-full px-4 py-3 text-sm md:text-lg bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-red-500"
+                                    className="w-full px-4 py-3 text-sm bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-red-500"
                                 />
                                 <FaEye
                                     onClick={() => setPasswordVisible(!passwordVisible)}
@@ -100,7 +100,7 @@ const ChangePassword = () => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <label className="block font-bold md:text-xl">New Password</label>
+                            <label className="block font-bold">New Password</label>
                             <div className="relative w-full">
                                 <input
                                     type={passwordVisible ? "text" : "password"}
@@ -109,7 +109,7 @@ const ChangePassword = () => {
                                         required: "New password is required",
                                         minLength: { value: 8, message: "Password must be at least 8 characters long!" },
                                     })}
-                                    className="w-full px-4 py-3 text-sm md:text-lg bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-red-500"
+                                    className="w-full px-4 py-3 text-sm bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-red-500"
                                 />
                                 <FaEye
                                     onClick={() => setPasswordVisible(!passwordVisible)}
@@ -122,7 +122,7 @@ const ChangePassword = () => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <label className="block font-bold md:text-xl">Confirm New Password</label>
+                            <label className="block font-bold">Confirm New Password</label>
                             <div className="relative w-full">
                                 <input
                                     type={passwordVisible ? "text" : "password"}
@@ -131,7 +131,7 @@ const ChangePassword = () => {
                                         required: "New password is required",
                                         minLength: { value: 8, message: "Password must be at least 8 characters long!" },
                                     })}
-                                    className="w-full px-4 py-3 text-sm md:text-lg bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-red-500"
+                                    className="w-full px-4 py-3 text-sm bg-transparent rounded-xl border border-gray-700 focus:outline-none focus:border-red-500"
                                 />
                                 <FaEye
                                     onClick={() => setPasswordVisible(!passwordVisible)}
@@ -153,14 +153,14 @@ const ChangePassword = () => {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition duration-300"
+                                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 md:py-2.5 rounded-lg transition duration-300"
                             >
                                 Update Password
                             </button>
                             <button
                                 type="button"
                                 onClick={() => router.back()}
-                                className="w-full text-white text-center font-medium bg-button-secondary hover:bg-button-secondary/90 px-3 md:px-4 py-3 rounded-lg transition duration-300"
+                                className="w-full text-white text-center font-medium bg-button-secondary hover:bg-button-secondary/90 px-3 md:px-4 py-3 md:py-2.5 rounded-lg transition duration-300"
                             >
                                 Cancel
                             </button>

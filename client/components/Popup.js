@@ -9,8 +9,8 @@ const Popup = () => {
     if (!popup.isVisible) return null;  
 
     return (
-        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 md:transform-none md:top-10 md:right-10 md:left-auto bg-accent rounded-lg w-[60%] md:w-auto p-2">
-            <div className="py-2 md:py-3 px-4 md:px-16 w-full text-center text-sm md:text-lg">
+        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 md:transform-none md:top-5 md:right-5 md:left-auto bg-white text-black rounded-lg w-[60%] md:w-auto p-1 md:p-2 z-[55]">
+            <div className=" px-1 md:px-5 w-full text-center text-sm ">
                 <p>{popup.message}</p>
             </div>
             <div
