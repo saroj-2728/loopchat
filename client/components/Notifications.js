@@ -120,10 +120,10 @@ const Notifications = ({ notificationsVisible, setNotificationsVisible }) => {
                                     notifications.map((notification, index) => {
                                         return (
                                             <div
-                                                className="w-full flex flex-row items-center justify-between py-5 px-7 border-y border-white/10"
+                                                className="w-full flex flex-row items-center justify-between py-5 px-7 border-y border-white/10 text-sm"
                                                 key={index}
                                             >
-                                                <p>
+                                                <p className="">
                                                     {notification?.responseFrom?.name} {notification?.response} your friend request.
                                                 </p>
                                                 <RxCross1
@@ -135,7 +135,8 @@ const Notifications = ({ notificationsVisible, setNotificationsVisible }) => {
                                     })
                                     :
                                     (
-                                        "No new notifications"
+                                        <p className="text-sm">No new notifications</p>
+                                        
                                     )
                             }
                         </div>
@@ -157,7 +158,7 @@ const Notifications = ({ notificationsVisible, setNotificationsVisible }) => {
                                         href={`/${request?.user1?.username}`}
                                         onClick={() => setNotificationsVisible(!notificationsVisible)}
                                         key={request?._id}
-                                        className={`w-full border-y border-y-white/5 py-2 cursor-pointer transition duration-300  text-white flex flex-row items-center justify-between gap-4 md:px-4 px-1`}
+                                        className={`w-full border-y border-y-white/5 py-2 cursor-pointer transition duration-300 text-sm text-white flex flex-row items-center justify-between gap-4 md:px-4 px-1`}
                                     >
                                         <div className='flex flex-row gap-2 items-center'>
                                             <div className="flex justify-center h-[50px] w-[50px]">
@@ -169,7 +170,7 @@ const Notifications = ({ notificationsVisible, setNotificationsVisible }) => {
                                                     alt="User Profile"
                                                 />
                                             </div>
-                                            <div className="text-base flex flex-row gap-3">
+                                            <div className="text-sm flex flex-row gap-3">
                                                 {`${request?.user1?.name}`}
                                             </div>
                                         </div>
@@ -217,7 +218,7 @@ const Notifications = ({ notificationsVisible, setNotificationsVisible }) => {
                         )
                             :
                             (
-                                "No friend requests at the moment."
+                                <p className="text-sm">No friend requests at the moment.</p>  
                             )}
                     </div>
                 </div>

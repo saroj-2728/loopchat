@@ -147,11 +147,11 @@ const MessagePage = ({ params }) => {
             className="rounded-full"
           />
         </div>
-        <p className='text-base'>
+        <div className='text-base'>
           {targetUser.name ? targetUser.name
             :
             <Loader size={'h-8 w-8'} text={''} />}
-        </p>
+        </div>
       </div>
 
       <div ref={ref} className="messageSection w-full overflow-auto flex-grow rounded-lg px-4 md:px-6">
@@ -162,7 +162,7 @@ const MessagePage = ({ params }) => {
               className={`flex flex-row w-full ${msgObj.senderId === profile?._id ? "justify-end" : "justify-start"} items-center gap-2 md:gap-3 my-5 md:my-3`}
             >
               {msgObj.senderId !== profile?._id &&
-                <div className='flex justify-center w-[30px] h-[30px] md:h-[38px] md:w-[38px]'>
+                <div className='flex justify-center w-[30px] h-[30px]'>
                   <Image
                     src={targetUser?.profileImage?.url || defaultProfileSrc}
                     height={40}

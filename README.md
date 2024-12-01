@@ -3,7 +3,7 @@
 LoopChat is a feature-rich, real-time chat application built using Next.js, Express.js, Tailwind CSS, and MongoDB. It supports user registration and authentication powered by Firebase Auth, real-time messaging, profile management, friend requests, notifications, and more. Designed with a responsive, mobile-friendly interface, LoopChat delivers a seamless user experience across devices.
 
 ## Live Demo
-Check out the live app: [LoopChat](https://next-js-chat-app-5lgs.vercel.app/)
+Check out the live app: [LoopChat](https://loopchat0.vercel.app/)
 
 ---
 
