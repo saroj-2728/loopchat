@@ -12,7 +12,7 @@ const MakeFriends = () => {
 
     const { profile } = useSession()
     const { showPopup } = usePopup()
-    const { friends, pendingRequests } = useFriends()
+    const { friends, pendingRequests, isDataReady } = useFriends()
 
     const defaultProfileSrc = DefaultProfile()
 
@@ -25,6 +25,8 @@ const MakeFriends = () => {
     );
 
     useEffect(() => {
+         if (!isDataReady) return;
+
         const fetchUsers = async () => {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users`, {
@@ -32,6 +34,7 @@ const MakeFriends = () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
+                    next: { revalidate: 3600 },
                 })
                 const result = await response.json()
 
@@ -77,7 +80,7 @@ const MakeFriends = () => {
                 })
             })
             const result = await response.json()
-
+            console.log('result: ', result);
             if (result.success) {
                 showPopup("Request sent!")
                 setFriendRequestStates((prev) => ({
@@ -86,13 +89,17 @@ const MakeFriends = () => {
                 }));
             }
             else {
-                throw new Error("Failed to send friend request");
+                showPopup("Couldn't send friend request", "red");
+                setFriendRequestStates((prev) => ({
+                    ...prev,
+                    [friendId]: { loading: false, sent: false },
+                }));
             }
 
         }
         catch (error) {
             console.error("Error Sending Friend Request: ", error);
-            showPopup("Couldn't send friend request!", "red");
+            showPopup("Failed to send friend request!", "red");
 
             setFriendRequestStates((prev) => ({
                 ...prev,

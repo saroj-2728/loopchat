@@ -14,61 +14,69 @@ export const FriendsProvider = ({ children }) => {
     const [pendingRequests, setPendingRequests] = useState([])
     const [notifications, setNotifications] = useState([])
     const [totalNotifications, setTotalNotifications] = useState([])
+    const [isDataReady, setIsDataReady] = useState(false);
+
+    const fetchFriends = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/friends/get-friends/accepted/${profile?._id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            const result = await response.json()
+
+            if (result.success) {
+                const processedFriends = result.data.map((friend) => {
+                    const friendUser = (friend?.user1?._id === profile?._id) ? friend?.user2 : friend?.user1;
+                    return {
+                        friendShipId: friend?._id,
+                        ...friendUser,
+                    }
+                });
+                setFriends(processedFriends)
+            }
+            else {
+                setFriends([])
+            }
+        } catch (err) {
+            setError("Failed to fetch users.");
+            console.error(err);
+        }
+    };
+
+    const fetchPendingRequests = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/friends/get-friends/pending/${profile?._id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            const result = await response.json()
+
+            if (result.success) {
+                setPendingRequests(result.data)
+            }
+            else
+                setPendingRequests([])
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     useEffect(() => {
         if (!profile?._id) return;
 
-        const fetchFriends = async () => {
-            try {
+        let cancelled = false;
 
-                const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/friends/get-friends/accepted/${profile?._id}`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                })
-                const result = await response.json()
-
-                if (result.success) {
-                    const processedFriends = result.data.map((friend) => {
-                        const friendUser = (friend?.user1?._id === profile?._id) ? friend?.user2 : friend?.user1;
-                        return {
-                            friendShipId: friend?._id,
-                            ...friendUser,
-                        }
-                    });
-                    setFriends(processedFriends)
-                }
-                else {
-                    setFriends([])
-                }
-            } catch (err) {
-                setError("Failed to fetch users.");
-                console.error(err);
-            }
+        const fetchAll = async () => {
+            await fetchFriends();
+            await fetchPendingRequests();
+            if (!cancelled) setIsDataReady(true);
         };
-        fetchFriends();
 
-        const fetchPendingRequests = async () => {
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/friends/get-friends/pending/${profile?._id}`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                })
-                const result = await response.json()
-
-                if (result.success) {
-                    setPendingRequests(result.data)
-                }
-                else
-                    setPendingRequests([])
-            } catch (err) {
-                console.error(err);
-            }
-        };
-        fetchPendingRequests();
+        fetchAll();
 
         if (socketRef.current) {
             socketRef.current.on("friendActivityUpdate", () => {
@@ -88,6 +96,7 @@ export const FriendsProvider = ({ children }) => {
 
         return () => {
             socketRef.current?.off("friendActivityUpdate");
+            cancelled = true
         };
     }, [socketRef.current, profile])
 
@@ -103,7 +112,14 @@ export const FriendsProvider = ({ children }) => {
 
 
     return (
-        <FriendContext.Provider value={{ friends, pendingRequests, notifications, totalNotifications, setNotifications }}>
+        <FriendContext.Provider value={{
+            friends,
+            pendingRequests,
+            isDataReady,
+            notifications,
+            totalNotifications,
+            setNotifications
+        }}>
             {children}
         </FriendContext.Provider>
     )
@@ -112,4 +128,3 @@ export const FriendsProvider = ({ children }) => {
 export const useFriends = () => {
     return useContext(FriendContext)
 }
-

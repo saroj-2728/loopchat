@@ -1,5 +1,5 @@
 {
-  "name": "next_js_frontend",
+  "name": "loopchat-client",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,18 +10,18 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "firebase": "^11.0.2",
+    "firebase": "^11.9.0",
     "js-cookie": "^3.0.5",
-    "next": "^15.0.3",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-hook-form": "^7.53.0",
-    "react-icons": "^5.3.0",
-    "socket.io-client": "^4.8.0"
+    "next": "^15.3.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.57.0",
+    "react-icons": "^5.5.0",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
-    "eslint": "^8",
-    "eslint-config-next": "14.2.9",
+    "eslint": "^9.28.0",
+    "eslint-config-next": "^15.3.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.1"
   }

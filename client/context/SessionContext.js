@@ -42,7 +42,7 @@ export const SessionProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, debouncedAuthHandler);
 
     return () => {
-      unsubscribe(); 
+      unsubscribe();
     };
   }, []);
 

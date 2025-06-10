@@ -36,7 +36,7 @@ export const PopupProvider = ({ children }) => {
     }, [popup.isVisible]);
 
     return (
-        <PopupContext.Provider value={{ popup, showPopup, percentage }}>
+        <PopupContext.Provider value={{ popup, setPopup, showPopup, percentage }}>
             {children}
         </PopupContext.Provider>
     );
